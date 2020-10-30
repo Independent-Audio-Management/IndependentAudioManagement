@@ -1,9 +1,11 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFonts } from 'expo-font';
 import { Container, Card, CardItem, Text } from 'native-base';
 import { Image } from 'react-native';
+const width = Dimensions.get('window').width
+const height = Dimensions.get('window').height
 
 export default function HomeScreen({ navigation }) {
     const [loaded] = useFonts({
@@ -38,10 +40,10 @@ export default function HomeScreen({ navigation }) {
               </CardItem>
           </Card>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('OffersScreen', {offers: offersArray } ) }>
+        <TouchableOpacity onPress={() => navigation.navigate('Task') }>
           <Card  style={styles.card2}>
           <CardItem cardBody>
-                <Image source={require('../assets/images/tasks.png')} style={{height: 200, width: null, flex: 1}}/>
+                <Image source={require('../assets/images/tasks.png')} style={{height: undefined, width: '80%', aspectRatio: 1}}/>
               </CardItem>
             <CardItem cardBody>
                 <Text style={styles.buttonText}>Tasks</Text>
@@ -61,8 +63,8 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   card1: {
-    height: 300,
-    width: 300, 
+    height: height/3,
+    width: (width)-100, 
     margin: 0, 
     padding: 0, 
     justifyContent:'center', 
@@ -74,8 +76,8 @@ const styles = StyleSheet.create({
     shadowOffset : { width: -15, height: 15}
   },
   card2: {
-    height: 300,
-    width: 300, 
+    height: height/3,
+    width: (width)-100, 
     margin: 0, 
     padding: 0, 
     justifyContent:'center', 

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity, Image, Dimensions, SafeView } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { LinearGradient } from "expo-linear-gradient";
 import { Card, CardItem, Button } from "native-base";
 import { Entypo } from '@expo/vector-icons'; 
+const width = Dimensions.get('window').width
+const height = Dimensions.get('window').height
 
 export default function QRScreen({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
@@ -80,7 +82,6 @@ export default function QRScreen({ navigation }) {
       <Button style={styles.backButton} onPress={() => navigation.navigate('Home') }>
           <Text style={styles.title}><Entypo name="home" size={30} color="white"/>Back to HOME</Text>
         </Button>
-
     </View>
   );
 }
@@ -94,8 +95,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   scanner: {
-    width: 400,
-    height: 350,
+    width: width,
+    height: height/2 - 50,
   },
   title: {
     fontWeight: "bold",
@@ -105,17 +106,13 @@ const styles = StyleSheet.create({
     // fontFamily: 'Rubik'
   },
   card: {
-    height: 200,
-    width: 200,
+    height: (height/6)+20,
+    width: width/3,
     margin: 0,
     paddingTop: 10,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 45,
-    shadowColor: "black",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: -15, height: 15 },
+    borderRadius: 15,
   },
   buttonText: {
     fontWeight: "bold",
@@ -125,6 +122,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom:0,
     left:0,
+    marginTop: 10,
     width: '100%',
     height: '12%',
     backgroundColor: '#F4A261',

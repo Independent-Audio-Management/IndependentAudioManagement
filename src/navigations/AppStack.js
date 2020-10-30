@@ -2,6 +2,7 @@ import * as React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../screens/HomeScreen';
 import QRScreen from '../screens/User/QRScreen';
+import TaskScreen from '../screens/User/TaskScreen';
 import { NavigationContainer } from '@react-navigation/native';
 
 const Stack = createStackNavigator();
@@ -12,6 +13,7 @@ const AppStack = () => {
       <Stack.Navigator initialRouteName="Home" headerMode="none">
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="QR" component={QRScreen} />
+        <Stack.Screen name="Task" component={TaskScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
