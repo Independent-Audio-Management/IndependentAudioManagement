@@ -5,7 +5,7 @@ import { useFonts } from 'expo-font';
 import { Container, Card, CardItem, Text } from 'native-base';
 import { Image } from 'react-native';
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
     const [loaded] = useFonts({
         Rubik: require('../assets/fonts/Rubik-Medium.ttf'),
     })
@@ -28,7 +28,7 @@ export default function HomeScreen() {
             }}
         />
         <Text style={styles.title}>Hello Gabe!</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('OffersScreen', {offers: offersArray } ) }>
+        <TouchableOpacity onPress={() => navigation.navigate('QR') }>
           <Card  style={styles.card1}>
           <CardItem cardBody>
               <Image source={require('../assets/images/scanQR.png')} style={{height: undefined, width: '80%', aspectRatio: 1}}/>
