@@ -4,6 +4,7 @@ import HomeScreen from '../screens/HomeScreen';
 import QRScreen from '../screens/User/QRScreen';
 import TaskScreen from '../screens/User/TaskScreen';
 import { NavigationContainer } from '@react-navigation/native';
+import InstructionScreen from '../screens/User/InstructionScreen';
 
 const Stack = createStackNavigator();
 
@@ -14,6 +15,7 @@ const AppStack = () => {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="QR" component={QRScreen} />
         <Stack.Screen name="Task" component={TaskScreen} />
+        <Stack.Screen name="InstructionScreen" component={InstructionScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

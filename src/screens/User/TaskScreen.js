@@ -7,7 +7,7 @@ import { Image } from 'react-native';
 import { Entypo } from '@expo/vector-icons'; 
 const width = Dimensions.get('window').width
 
-export default function QRScreen({ navigation }) {
+export default function TaskScreen({ navigation }) {
     const [loaded] = useFonts({
         Rubik: require('../../assets/fonts/Rubik-Regular.ttf'),
     })
@@ -32,7 +32,7 @@ export default function QRScreen({ navigation }) {
             }}
         />
         <Text style={styles.subtitle}>Next</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('OffersScreen', {offers: offersArray } ) }>
+        <TouchableOpacity onPress={() => navigation.navigate('InstructionScreen', {'task': 'Brush Teeth'} ) }>
           <Card  style={styles.highlight}>
           <CardItem cardBody>
               <Image source={require('../../assets/images/toothbrush.png')} style={{height: undefined, width: '50%', aspectRatio: 1}}/>
@@ -50,7 +50,7 @@ export default function QRScreen({ navigation }) {
             return(
             < View style={{flex :1, flexDirection: 'row'}}>
 {taskRow.map((task,i)=>{
-            return (<TouchableOpacity onPress={() => navigation.navigate('OffersScreen', {offers: offersArray } ) }>
+            return (<TouchableOpacity onPress={() => navigation.navigate('InstructionScreen', {'task': task}) }>
                <Card  style={styles.tasks}>
                <CardItem cardBody>
                      {/* <Image source={require('../../assets/images/tasks.png')} style={{height: 50, width: null, flex: 1}}/> */}
@@ -71,7 +71,7 @@ export default function QRScreen({ navigation }) {
           </ScrollView>
 
         {/* < View style={{flex :1, flexDirection: 'row'}}>
-         <TouchableOpacity onPress={() => navigation.navigate('OffersScreen', {offers: offersArray } ) }>
+         <TouchableOpacity onPress={() => navigation.navigate('InstructionScreen') }>
             <Card  style={styles.tasks}>
             <CardItem cardBody>
                   <Image source={require('../../assets/images/tasks.png')} style={{height: 50, width: null, flex: 1}}/>
@@ -83,7 +83,7 @@ export default function QRScreen({ navigation }) {
           </TouchableOpacity>
         </View>   */}
             <Button style={styles.backButton} onPress={() => navigation.navigate('Home') }>
-          <Text style={styles.buttonText}><Entypo name="home" size={30} color="white"/>Back to HOME</Text>
+          <Text style={styles.buttonText}><Entypo name="home" size={30} color="white"/> Back to HOME</Text>
         </Button>
         
       </SafeAreaView>

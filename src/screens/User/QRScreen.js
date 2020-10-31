@@ -34,7 +34,7 @@ export default function QRScreen({ navigation }) {
     setTask(
       <TouchableOpacity
         onPress={() =>
-          navigation.navigate("OffersScreen", { offers: offersArray })
+          navigation.navigate("InstructionScreen", {'task': data})
         }
       >
         <Card style={styles.card}>
