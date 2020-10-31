@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Text, Button } from 'native-base';
-import { SafeAreaView, StyleSheet, Dimensions } from 'react-native';
+import { Text, Button, Card, CardItem } from 'native-base';
+import { SafeAreaView, StyleSheet, Dimensions, Image, TouchableOpacity } from 'react-native';
 import { Entypo } from '@expo/vector-icons'; 
 import { useFonts } from 'expo-font';
 import { hardcodedInstructions } from './HardcodedInstructions';
@@ -46,9 +46,27 @@ export default function InstructionScreen({ navigation, route }) {
                 height={10} 
             />
             <Text style={styles.progressPercentage}>29% Done</Text>
+
+            <Card style={styles.highlight}>
+                <CardItem cardBody>
+                    <Image source={require('../../assets/images/toothbrush.png')} 
+                        style={{ height: undefined, width: '50%', aspectRatio: 1 }} />
+                </CardItem>
+                <CardItem cardBody>
+                    <Text style={styles.cardText}>Put toothpaste on toothbrush</Text>
+                </CardItem>
+            </Card>
+
+            <TouchableOpacity onPress={() => console.debug("replay audio")}>
+            <Card style={styles.replayAudioCard}>
+                <CardItem cardBody>
+                    <Text style={styles.replayAudio}><Entypo name="cw" size={30} color="black" /> Replay Audio</Text>
+                </CardItem>
+            </Card>
+            </TouchableOpacity>
         
             <Button style={styles.backButton} onPress={() => navigation.navigate('Task')}>
-                <Text style={styles.buttonText}><Entypo name="back" size={30} color="white" /> Back to TASKS</Text>
+                <Text style={styles.buttonText}><Entypo name="arrow-bold-left" size={30} color="white" /> Back to TASKS</Text>
             </Button>
         </ SafeAreaView>
     );
@@ -60,6 +78,19 @@ const styles = StyleSheet.create({
         // alignItems: 'center',
         // justifyContent: 'center',
         // textAlign: 'center'
+    },
+    highlight: {
+        height: 200,
+        width: (width) - 40,
+        marginLeft: 20,
+        padding: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 45,
+        shadowColor: 'black',
+        shadowOpacity: 0.5,
+        shadowRadius: 10,
+        shadowOffset: { width: -15, height: 15 }
     },
     title: {
         // fontWeight:"bold",
@@ -86,5 +117,25 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: '#000',
         marginLeft: 15
+    },
+    cardText: {
+        fontSize: 20
+    },
+    replayAudio: {
+        fontSize: 30,
+        fontWeight: "bold"
+    },
+    replayAudioCard: {
+        height: 80,
+        width: (width) - 40,
+        marginLeft: 20,
+        padding: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 45,
+        shadowColor: 'black',
+        shadowOpacity: 0.5,
+        shadowRadius: 10,
+        shadowOffset: { width: -15, height: 15 }
     }
 });
