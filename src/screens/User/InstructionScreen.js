@@ -103,10 +103,12 @@ export default function InstructionScreen({ navigation, route }) {
                 }
 
                 {currentStepNum == steps.length - 1 ? <>
-                        <Card style={{ ...styles.circleCard, backgroundColor: "gray"}}>
-                            <Entypo name="arrow-bold-right" size={50} color="black" />
-                            <Text style={styles.stepText}>Next step</Text>
-                        </Card>
+                        <TouchableOpacity onPress={() => navigation.navigate('CongratsScreen')}>
+                            <Card style={{...styles.circleCard, backgroundColor: "green"}}>
+                                <Entypo name="check" size={75} color="white" />
+                                <Text style={{...styles.stepText, color: "#fff"}}>Task done</Text>
+                            </Card>
+                        </TouchableOpacity>
                 </>
                 : 
                     <TouchableOpacity onPress={() => {
