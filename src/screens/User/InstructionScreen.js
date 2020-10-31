@@ -8,6 +8,9 @@ import { hardcodedInstructions } from './HardcodedInstructions';
 import ProgressBar from 'react-native-progress/Bar';
 const width = Dimensions.get('window').width
 
+function playAudio(pathToFile) {
+    console.debug("playing audio: " + pathToFile);
+}
 
 export default function InstructionScreen({ navigation, route }) {
     
@@ -15,7 +18,10 @@ export default function InstructionScreen({ navigation, route }) {
         Rubik: require('../../assets/fonts/Rubik-Regular.ttf'),
     })
 
+    const [currentStepNum, setCurrentStepNum] = useState(0);
+
     if (!loaded) return null;
+
 
     console.debug("hello!!");
     console.debug(route);
@@ -37,17 +43,19 @@ export default function InstructionScreen({ navigation, route }) {
                 }}
             />
             <Text style={styles.title}>{route.params.task}</Text>
+
+            {steps.length > 0 ? <>
             <ProgressBar 
                 marginTop={10}
                 marginLeft={14} 
-                progress={0.3} 
+                progress={currentStepNum / steps.length} 
                 width={0.9 * width} 
                 color='#2A9D8F' 
                 backgroundColor={"#fff"}
                 borderWidth={0}
                 height={10} 
             />
-            <Text style={styles.progressPercentage}>29% Done</Text>
+            <Text style={styles.progressPercentage}>{Math.round(currentStepNum / steps.length * 100)}% Done</Text>
 
             <Card style={styles.highlight}>
                 <CardItem cardBody>
@@ -55,11 +63,14 @@ export default function InstructionScreen({ navigation, route }) {
                         style={{ height: undefined, width: '50%', aspectRatio: 1 }} />
                 </CardItem>
                 <CardItem cardBody>
-                    <Text style={styles.cardText}>Put toothpaste on toothbrush</Text>
+                    <Text style={styles.cardText}>{steps[currentStepNum].text}</Text>
                 </CardItem>
             </Card>
 
-            <TouchableOpacity onPress={() => console.debug("replay audio")}>
+            <TouchableOpacity onPress={() => {
+                console.debug("replay audio");
+                playAudio(steps[currentStepNum].audioPath);
+            }}>
             <Card style={styles.replayAudioCard}>
                 <CardItem cardBody>
                     <Text style={styles.replayAudio}><Entypo name="cw" size={30} color="black" /> Replay Audio</Text>
@@ -68,20 +79,51 @@ export default function InstructionScreen({ navigation, route }) {
             </TouchableOpacity>
 
             <View style={{ flex: 1, flexDirection: 'row' }}>
-                <TouchableOpacity onPress={() => console.debug("previous step")}>
-                    <Card style={styles.circleCard}>
-                        <Entypo name="arrow-bold-left" size={50} color="black"/>
-                        <Text style={styles.stepText}>Previous step</Text>
-                    </Card>
-                </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => console.debug("next step")}>
-                    <Card style={styles.circleCard}>
-                        <Entypo name="arrow-bold-right" size={50} color="black" />
-                        <Text style={styles.stepText}>Next step</Text>
-                    </Card>
-                </TouchableOpacity>
+                {currentStepNum == 0 ? <>
+                        <Card style={{ ...styles.circleCard, backgroundColor: "gray"}}>
+                            <Entypo name="arrow-bold-left" size={50} color="black" />
+                            <Text style={styles.stepText}>Previous step</Text>
+                        </Card>
+                </> 
+                : 
+                    <TouchableOpacity onPress={() => {
+                        // previous step button pressed
+                        console.debug("previous");
+                        if (currentStepNum >= 1) {
+                            setCurrentStepNum(s => s - 1);
+                            playAudio(steps[currentStepNum - 1].audioPath);
+                        }
+                    }}>
+                        <Card style={styles.circleCard}>
+                            <Entypo name="arrow-bold-left" size={50} color="black" />
+                            <Text style={styles.stepText}>Previous step</Text>
+                        </Card>
+                    </TouchableOpacity>
+                }
+
+                {currentStepNum == steps.length - 1 ? <>
+                        <Card style={{ ...styles.circleCard, backgroundColor: "gray"}}>
+                            <Entypo name="arrow-bold-right" size={50} color="black" />
+                            <Text style={styles.stepText}>Next step</Text>
+                        </Card>
+                </>
+                : 
+                    <TouchableOpacity onPress={() => {
+                        console.debug("next step");
+                        if (currentStepNum < steps.length - 1) {
+                            setCurrentStepNum(s => s + 1);
+                            playAudio(steps[currentStepNum + 1].audioPath);
+                        }
+                    }}>
+                        <Card style={styles.circleCard}>
+                            <Entypo name="arrow-bold-right" size={50} color="black" />
+                            <Text style={styles.stepText}>Next step</Text>
+                        </Card>
+                    </TouchableOpacity>
+                }
             </ View>
+            </> : <></> }
         
             <Button style={styles.backButton} onPress={() => navigation.navigate('Task')}>
                 <Text style={styles.buttonText}><Entypo name="reply" size={30} color="white" /> Back to TASKS</Text>
@@ -98,7 +140,7 @@ const styles = StyleSheet.create({
         // textAlign: 'center'
     },
     highlight: {
-        height: 200,
+        height: 230,
         width: (width) - 40,
         marginLeft: 20,
         padding: 0,
@@ -161,7 +203,7 @@ const styles = StyleSheet.create({
         height: 140,
         width: (width/2) - 35,
         marginLeft: 22,
-        marginTop: 20,
+        marginTop: 8,
         padding: 0,
         justifyContent: 'center',
         alignItems: 'center',
