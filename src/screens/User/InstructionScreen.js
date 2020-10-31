@@ -28,8 +28,7 @@ export default function InstructionScreen({ navigation, route }) {
         soundObject.loadAsync(steps[currentStepNum].audio, { shouldPlay: true });
         soundObject.setOnPlaybackStatusUpdate(status => {
             if (status.didJustFinish) {
-                console.debug("sound finished playing!");
-                setCurrentStepNum(s => s <= steps.length - 2 ? s + 1 : s);
+                if (currentStepNum <= steps.length - 2) setCurrentStepNum(s => s + 1);
             }
         });
     }).then(() => {
