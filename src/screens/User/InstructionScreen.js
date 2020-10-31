@@ -1,10 +1,13 @@
 import React, {useState} from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text, Button } from 'native-base';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import { SafeAreaView, StyleSheet, Dimensions } from 'react-native';
 import { Entypo } from '@expo/vector-icons'; 
 import { useFonts } from 'expo-font';
 import { hardcodedInstructions } from './HardcodedInstructions';
+import ProgressBar from 'react-native-progress/Bar';
+const width = Dimensions.get('window').width
+
 
 export default function InstructionScreen({ navigation, route }) {
     
@@ -20,8 +23,6 @@ export default function InstructionScreen({ navigation, route }) {
     let steps = hardcodedInstructions[route.params.task];
     console.debug(steps);
 
-    
-
     return (
         <SafeAreaView style={styles.container}>
             <LinearGradient
@@ -36,6 +37,15 @@ export default function InstructionScreen({ navigation, route }) {
                 }}
             />
             <Text style={styles.title}>{route.params.task}</Text>
+            <ProgressBar 
+                marginTop={10}
+                marginLeft={14} 
+                progress={0.3} 
+                width={0.9 * width} 
+                color='#2A9D8F' 
+                height={10} 
+            />
+            <Text style={styles.progressPercentage}>29% Done</Text>
         
             <Button style={styles.backButton} onPress={() => navigation.navigate('Task')}>
                 <Text style={styles.buttonText}><Entypo name="back" size={30} color="white" /> Back to TASKS</Text>
@@ -71,5 +81,10 @@ const styles = StyleSheet.create({
         height: '12%',
         backgroundColor: '#2A9D8F',
         justifyContent: "center"
+    },
+    progressPercentage: {
+        fontSize: 15,
+        color: '#000',
+        marginLeft: 15
     }
 });
