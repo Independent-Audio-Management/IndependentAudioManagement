@@ -1,6 +1,6 @@
 import React from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import { SafeAreaView, StyleSheet, Image } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Text, Button } from 'native-base';
 import { Entypo } from '@expo/vector-icons'; 
@@ -30,7 +30,7 @@ export default function CongratsScreen({navigation}) {
                 fontSize: 40,
                 color: '#fff',
                 marginLeft: 20,
-                marginTop: 60,
+                marginTop: 70,
                 fontFamily: 'Rubik'
             }}>Congratulations!</Text>
             <Text style={{
@@ -40,6 +40,14 @@ export default function CongratsScreen({navigation}) {
                 marginTop: 10,
                 fontFamily: 'Rubik'
             }}>You completed the task!</Text>
+
+            <Image source={require('../../assets/images/youdidit.png')}
+                style={{ 
+                    height: undefined, 
+                    width: '100%', 
+                    aspectRatio: 1,
+                    marginTop: 40
+                }} />
 
             <Button style={styles.backButton} onPress={() => navigation.navigate('Task')}>
                 <Text style={styles.buttonText}><Entypo name="reply" size={30} color="white" /> Back to TASKS</Text>
