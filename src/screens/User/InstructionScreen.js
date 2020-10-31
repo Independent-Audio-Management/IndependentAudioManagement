@@ -26,7 +26,14 @@ export default function InstructionScreen({ navigation, route }) {
     let soundObject = new Audio.Sound();
     let audioPromise = new Promise((resolve, reject) => {
         soundObject.loadAsync(steps[currentStepNum].audio, { shouldPlay: true });
+        soundObject.setOnPlaybackStatusUpdate(status => {
+            if (status.didJustFinish) {
+                console.debug("sound finished playing!");
+                setCurrentStepNum(s => s <= steps.length - 2 ? s + 1 : s);
+            }
+        });
     }).then(() => {
+        
         soundObject.unloadAsync();
     });
 
