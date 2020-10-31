@@ -59,7 +59,7 @@ export default function InstructionScreen({ navigation, route }) {
 
             <Card style={styles.highlight}>
                 <CardItem cardBody>
-                    <Image source={require('../../assets/images/toothbrush.png')} 
+                        <Image source={steps[currentStepNum].image} 
                         style={{ height: undefined, width: '50%', aspectRatio: 1 }} />
                 </CardItem>
                 <CardItem cardBody>
