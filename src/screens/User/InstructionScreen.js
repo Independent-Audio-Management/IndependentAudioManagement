@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text, Button, Card, CardItem } from 'native-base';
-import { SafeAreaView, StyleSheet, Dimensions, Image, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, Dimensions, Image, TouchableOpacity, View } from 'react-native';
 import { Entypo } from '@expo/vector-icons'; 
 import { useFonts } from 'expo-font';
 import { hardcodedInstructions } from './HardcodedInstructions';
@@ -43,6 +43,8 @@ export default function InstructionScreen({ navigation, route }) {
                 progress={0.3} 
                 width={0.9 * width} 
                 color='#2A9D8F' 
+                backgroundColor={"#fff"}
+                borderWidth={0}
                 height={10} 
             />
             <Text style={styles.progressPercentage}>29% Done</Text>
@@ -64,9 +66,25 @@ export default function InstructionScreen({ navigation, route }) {
                 </CardItem>
             </Card>
             </TouchableOpacity>
+
+            <View style={{ flex: 1, flexDirection: 'row' }}>
+                <TouchableOpacity onPress={() => console.debug("previous step")}>
+                    <Card style={styles.circleCard}>
+                        <Entypo name="arrow-bold-left" size={50} color="black"/>
+                        <Text style={styles.stepText}>Previous step</Text>
+                    </Card>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => console.debug("next step")}>
+                    <Card style={styles.circleCard}>
+                        <Entypo name="arrow-bold-right" size={50} color="black" />
+                        <Text style={styles.stepText}>Next step</Text>
+                    </Card>
+                </TouchableOpacity>
+            </ View>
         
             <Button style={styles.backButton} onPress={() => navigation.navigate('Task')}>
-                <Text style={styles.buttonText}><Entypo name="arrow-bold-left" size={30} color="white" /> Back to TASKS</Text>
+                <Text style={styles.buttonText}><Entypo name="reply" size={30} color="white" /> Back to TASKS</Text>
             </Button>
         </ SafeAreaView>
     );
@@ -86,7 +104,7 @@ const styles = StyleSheet.create({
         padding: 0,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 45,
+        borderRadius: 30,
         shadowColor: 'black',
         shadowOpacity: 0.5,
         shadowRadius: 10,
@@ -129,13 +147,31 @@ const styles = StyleSheet.create({
         height: 80,
         width: (width) - 40,
         marginLeft: 20,
+        marginTop: 10,
         padding: 0,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 45,
+        borderRadius: 30,
         shadowColor: 'black',
         shadowOpacity: 0.5,
         shadowRadius: 10,
         shadowOffset: { width: -15, height: 15 }
+    },
+    circleCard: {
+        height: 140,
+        width: (width/2) - 35,
+        marginLeft: 22,
+        marginTop: 20,
+        padding: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 90,
+        shadowColor: 'black',
+        shadowOpacity: 0.5,
+        shadowRadius: 10,
+        shadowOffset: { width: -15, height: 15 }
+    },
+    stepText: {
+        fontSize: 18
     }
 });
