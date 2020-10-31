@@ -6,11 +6,9 @@ import { Entypo } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import { hardcodedInstructions } from './HardcodedInstructions';
 import ProgressBar from 'react-native-progress/Bar';
-const width = Dimensions.get('window').width
+import { Audio } from 'expo-av';
 
-function playAudio(pathToFile) {
-    console.debug("playing audio: " + pathToFile);
-}
+const width = Dimensions.get('window').width
 
 export default function InstructionScreen({ navigation, route }) {
     
@@ -22,12 +20,15 @@ export default function InstructionScreen({ navigation, route }) {
 
     if (!loaded) return null;
 
-
-    console.debug("hello!!");
-    console.debug(route);
-    console.debug(route.params.task);
     let steps = hardcodedInstructions[route.params.task];
-    console.debug(steps);
+
+    // play audio
+    let soundObject = new Audio.Sound();
+    let audioPromise = new Promise((resolve, reject) => {
+        soundObject.loadAsync(steps[currentStepNum].audio, { shouldPlay: true });
+    }).then(() => {
+        soundObject.unloadAsync();
+    });
 
     return (
         <SafeAreaView style={styles.container}>
@@ -68,8 +69,7 @@ export default function InstructionScreen({ navigation, route }) {
             </Card>
 
             <TouchableOpacity onPress={() => {
-                console.debug("replay audio");
-                playAudio(steps[currentStepNum].audioPath);
+                soundObject.replayAsync();
             }}>
             <Card style={styles.replayAudioCard}>
                 <CardItem cardBody>
@@ -89,10 +89,9 @@ export default function InstructionScreen({ navigation, route }) {
                 : 
                     <TouchableOpacity onPress={() => {
                         // previous step button pressed
-                        console.debug("previous");
                         if (currentStepNum >= 1) {
                             setCurrentStepNum(s => s - 1);
-                            playAudio(steps[currentStepNum - 1].audioPath);
+                            soundObject.stopAsync();
                         }
                     }}>
                         <Card style={styles.circleCard}>
@@ -103,7 +102,10 @@ export default function InstructionScreen({ navigation, route }) {
                 }
 
                 {currentStepNum == steps.length - 1 ? <>
-                        <TouchableOpacity onPress={() => navigation.navigate('CongratsScreen')}>
+                        <TouchableOpacity onPress={() => {
+                            soundObject.stopAsync();
+                            navigation.navigate('CongratsScreen');
+                        }}>
                             <Card style={{...styles.circleCard, backgroundColor: "green"}}>
                                 <Entypo name="check" size={75} color="white" />
                                 <Text style={{...styles.stepText, color: "#fff"}}>Task done</Text>
@@ -112,10 +114,9 @@ export default function InstructionScreen({ navigation, route }) {
                 </>
                 : 
                     <TouchableOpacity onPress={() => {
-                        console.debug("next step");
                         if (currentStepNum < steps.length - 1) {
                             setCurrentStepNum(s => s + 1);
-                            playAudio(steps[currentStepNum + 1].audioPath);
+                            soundObject.stopAsync();
                         }
                     }}>
                         <Card style={styles.circleCard}>
@@ -127,7 +128,10 @@ export default function InstructionScreen({ navigation, route }) {
             </ View>
             </> : <></> }
         
-            <Button style={styles.backButton} onPress={() => navigation.navigate('Task')}>
+            <Button style={styles.backButton} onPress={() => {
+                soundObject.stopAsync();
+                navigation.navigate('Task');
+            }}>
                 <Text style={styles.buttonText}><Entypo name="reply" size={30} color="white" /> Back to TASKS</Text>
             </Button>
         </ SafeAreaView>

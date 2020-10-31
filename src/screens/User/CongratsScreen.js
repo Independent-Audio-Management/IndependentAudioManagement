@@ -4,6 +4,7 @@ import { SafeAreaView, StyleSheet, Image } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Text, Button } from 'native-base';
 import { Entypo } from '@expo/vector-icons'; 
+import { Audio } from 'expo-av';
 
 export default function CongratsScreen({navigation}) {
 
@@ -12,6 +13,14 @@ export default function CongratsScreen({navigation}) {
     })
 
     if (!loaded) return null;
+
+    // play audio
+    let soundObject = new Audio.Sound();
+    let audioPromise = new Promise((resolve, reject) => {
+        soundObject.loadAsync(require('../../assets/sounds/Congrats.m4a'), { shouldPlay: true });
+    }).then(() => {
+        soundObject.unloadAsync();
+    });
 
     return (
         <SafeAreaView style={styles.container}>
@@ -49,7 +58,10 @@ export default function CongratsScreen({navigation}) {
                     marginTop: 40
                 }} />
 
-            <Button style={styles.backButton} onPress={() => navigation.navigate('Task')}>
+            <Button style={styles.backButton} onPress={() => {
+                soundObject.stopAsync();
+                navigation.navigate('Task');
+            }}>
                 <Text style={styles.buttonText}><Entypo name="reply" size={30} color="white" /> Back to TASKS</Text>
             </Button>
         </SafeAreaView>

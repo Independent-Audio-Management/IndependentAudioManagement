@@ -5,37 +5,37 @@ let hardcodedInstructions = {
         {
             text: 'Get your toothbrush and toothpaste',
             image: require('../../assets/images/brushteeth0.jpg'),
-            audioPath: 'audio path 1'
+            audio: require('../../assets/sounds/Toothbrush0.m4a')
         },
         {
             text: 'Put toothpaste on the toothbrush',
             image: require('../../assets/images/brushteeth1.png'),
-            audioPath: 'audio path 2'
+            audio: require('../../assets/sounds/Toothbrush1.m4a')
         },
         {
             text: 'Hold the toothbrush to your teeth',
             image: require('../../assets/images/brushteeth2.jpg'),
-            audioPath: 'audio path 3'
+            audio: require('../../assets/sounds/Toothbrush2.m4a')
         },
         {
             text: 'Move the toothbrush up and down',
             image: require('../../assets/images/brushteeth3.png'),
-            audioPath: 'audio path 4'
+            audio: require('../../assets/sounds/Toothbrush3.m4a')
         },
         {
             text: 'Wait 1 minute',
             image: require('../../assets/images/brushteeth4.jpg'),
-            audioPath: 'audio path 5'
+            audio: require('../../assets/sounds/Toothbrush4.m4a')
         },
         {
             text: 'Clean your toothbrush with water',
             image: require('../../assets/images/brushteeth5.png'),
-            audioPath: 'audio path 6'
+            audio: require('../../assets/sounds/Toothbrush5.m4a')
         },
         {
             text: 'Rinse your mouth with water',
             image: require('../../assets/images/brushteeth6.png'),
-            audioPath: 'audio path 7'
+            audio: require('../../assets/sounds/Toothbrush6.m4a')
         }
     ],
     'Make Bed': [],
