@@ -28,14 +28,14 @@ let hardcodedInstructions = {
             audio: require('../../assets/sounds/Toothbrush4.m4a')
         },
         {
-            text: 'Clean your toothbrush with water',
-            image: require('../../assets/images/brushteeth5.png'),
-            audio: require('../../assets/sounds/Toothbrush5.m4a')
-        },
-        {
             text: 'Rinse your mouth with water',
             image: require('../../assets/images/brushteeth6.png'),
             audio: require('../../assets/sounds/Toothbrush6.m4a')
+        },
+        {
+            text: 'Clean your toothbrush with water',
+            image: require('../../assets/images/brushteeth5.png'),
+            audio: require('../../assets/sounds/Toothbrush5.m4a')
         }
     ],
     'Make Bed': [],
