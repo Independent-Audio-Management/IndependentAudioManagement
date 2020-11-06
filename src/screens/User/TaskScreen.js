@@ -16,7 +16,9 @@ export default function TaskScreen({ navigation }) {
         return null
     }
 
-    const tasks = [{category: 'Morning', tasks: [['Make Bed', 'Brush Teeth'], ['Wash Face', 'Comb Hair']]}, {category: 'Motivators', tasks: [['Make Smoothie', 'Bake Cookies']]}]
+    const tasks = [{category: 'Morning', tasks: [[{name: 'Make Bed', image: require('../../assets/images/bed.png')}, {name: 'Brush Teeth', image: require('../../assets/images/toothbrush.png')}], 
+    [{name: 'Wash Face', image: require('../../assets/images/washface.png')}, {name: 'Comb Hair', image: require('../../assets/images/combhair.png')}]]}, 
+    {category: 'Motivators', tasks: [[{name: 'Make Smoothie', image: require('../../assets/images/smoothie.png')}, {name: 'Bake Cookies', image: require('../../assets/images/cookies.png')}]]}]
 
   return (
       <SafeAreaView style={styles.container}>
@@ -32,13 +34,13 @@ export default function TaskScreen({ navigation }) {
             }}
         />
         <Text style={styles.subtitle}>Next</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('InstructionScreen', {'task': 'Brush Teeth'} ) }>
+        <TouchableOpacity onPress={() => navigation.navigate('InstructionScreen', {'task': 'Make Smoothie'} ) }>
           <Card  style={styles.highlight}>
           <CardItem cardBody>
-              <Image source={require('../../assets/images/toothbrush.png')} style={{height: undefined, width: '50%', aspectRatio: 1}}/>
+              <Image source={require('../../assets/images/smoothie.png')} style={{height: undefined, width: '50%', aspectRatio: 1}}/>
             </CardItem>
             <CardItem cardBody>
-                <Text style={styles.buttonText}>Brush Teeth</Text>
+                <Text style={styles.buttonText}>Make Smoothie</Text>
               </CardItem>
           </Card>
         </TouchableOpacity>
@@ -49,14 +51,14 @@ export default function TaskScreen({ navigation }) {
           {elem.tasks.map((taskRow,i)=>{
             return(
             < View style={{flex :1, flexDirection: 'row'}}>
-{taskRow.map((task,i)=>{
-            return (<TouchableOpacity onPress={() => navigation.navigate('InstructionScreen', {'task': task}) }>
+{taskRow.map((task)=>{
+            return (<TouchableOpacity onPress={() => navigation.navigate('InstructionScreen', {'task': task.name}) }>
                <Card  style={styles.tasks}>
                <CardItem cardBody>
-                     {/* <Image source={require('../../assets/images/tasks.png')} style={{height: 50, width: null, flex: 1}}/> */}
+                     <Image source={task.image} style={{height: 100, width: null, flex: 1}}/>
                    </CardItem>
                  <CardItem cardBody>
-                     <Text style={styles.buttonText}>{task}</Text>
+                     <Text style={styles.buttonText}>{task.name}</Text>
                    </CardItem>
                </Card>
              </TouchableOpacity>)
