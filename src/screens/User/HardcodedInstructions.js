@@ -79,12 +79,12 @@ let hardcodedInstructions = {
         },
         {
             text: 'Hold power button for 10 seconds',
-            image: require('../../assets/images/smoothie/snoothie7.jpg'),
+            image: require('../../assets/images/smoothie/smoothie7.jpg'),
             audio: require('../../assets/sounds/smoothie/smoothie7.m4a')
         },
         {
             text: 'Remove blender lid and pour smoothie into cup',
-            image: require('../../assets/images/smoothie/snoothie8.jpg'),
+            image: require('../../assets/images/smoothie/smoothie8.jpg'),
             audio: require('../../assets/sounds/smoothie/smoothie8.m4a')
         }
     ],

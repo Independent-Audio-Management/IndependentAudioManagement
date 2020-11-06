@@ -31,12 +31,11 @@ export default function InstructionScreen({ navigation, route }) {
                 if (currentStepNum <= steps.length - 2) {
                     setTimeout(() => {
                         setCurrentStepNum(s => s + 1);                        
-                    }, 5000);
+                    }, 3000);
                 }
             }
         });
     }).then(() => {
-        
         soundObject.unloadAsync();
     });
 
@@ -70,8 +69,8 @@ export default function InstructionScreen({ navigation, route }) {
 
             <Card style={styles.highlight}>
                 <CardItem cardBody>
-                        <Image source={steps[currentStepNum].image} 
-                        style={{ height: undefined, width: '50%', aspectRatio: 1 }} />
+                        {steps[currentStepNum].image != undefined && <Image source={steps[currentStepNum].image} 
+                        style={{ height: undefined, width: '50%', aspectRatio: 1 }} />}
                 </CardItem>
                 <CardItem cardBody>
                     <Text style={styles.cardText}>{steps[currentStepNum].text}</Text>
