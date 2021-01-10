@@ -69,11 +69,11 @@ export default function InstructionScreen({ navigation, route }) {
 
             <Card style={styles.highlight}>
                 <CardItem cardBody>
-                        {steps[currentStepNum].image != undefined && <Image source={steps[currentStepNum].image} 
+                        {steps[currentStepNum] != undefined && <Image source={steps[currentStepNum].image} 
                         style={{ height: undefined, width: '50%', aspectRatio: 1 }} />}
                 </CardItem>
                 <CardItem cardBody>
-                    <Text style={styles.cardText}>{steps[currentStepNum].text}</Text>
+                    {steps[currentStepNum] != undefined && <Text style={styles.cardText}>{steps[currentStepNum].text}</Text>}
                 </CardItem>
             </Card>
 
@@ -150,9 +150,6 @@ export default function InstructionScreen({ navigation, route }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // alignItems: 'center',
-        // justifyContent: 'center',
-        // textAlign: 'center'
     },
     highlight: {
         height: 230,

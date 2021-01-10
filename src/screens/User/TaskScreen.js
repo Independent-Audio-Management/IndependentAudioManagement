@@ -1,24 +1,48 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, View, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFonts } from 'expo-font';
 import { Container, Card, CardItem, Text, Button } from 'native-base';
 import { Image } from 'react-native';
 import { Entypo } from '@expo/vector-icons'; 
+import { db } from '../../utils/firebase';
 const width = Dimensions.get('window').width
 
 export default function TaskScreen({ navigation }) {
-    const [loaded] = useFonts({
-        Rubik: require('../../assets/fonts/Rubik-Regular.ttf'),
-    })
+  const [userId, settUserId] = useState('36112759-7710-4c22-b63b-8433b507f02e')
+  const [tasks, setTasks] = useState([])
+  const [loaded] = useFonts({
+      Rubik: require('../../assets/fonts/Rubik-Regular.ttf'),
+  })
 
-    if (!loaded) {
-        return null
-    }
-
-    const tasks = [{category: 'Morning', tasks: [[{name: 'Make Bed', image: require('../../assets/images/bed.png')}, {name: 'Brush Teeth', image: require('../../assets/images/toothbrush.png')}], 
-    [{name: 'Wash Face', image: require('../../assets/images/washface.png')}, {name: 'Comb Hair', image: require('../../assets/images/combhair.png')}]]}, 
-    {category: 'Motivators', tasks: [[{name: 'Make Smoothie', image: require('../../assets/images/smoothie.png')}, {name: 'Bake Cookies', image: require('../../assets/images/cookies.png')}]]}]
+    // const [tasks] = useState([{category: 'Morning', tasks: [[{name: 'Make Bed', image: require('../../assets/images/bed.png')}, {name: 'Brush Teeth', image: require('../../assets/images/toothbrush.png')}], 
+    // [{name: 'Wash Face', image: require('../../assets/images/washface.png')}, {name: 'Comb Hair', image: require('../../assets/images/combhair.png')}]]}, 
+    // {category: 'Motivators', tasks: [[{name: 'Make Smoothie', image: require('../../assets/images/smoothie.png')}, {name: 'Bake Cookies', image: require('../../assets/images/cookies.png')}]]}])
+    useEffect(() => {
+        const onValueChange = db.ref(`/users/${userId}/tasks`)
+        .on('value', (snapshot) => {
+          console.log('User datas: ', snapshot.val());
+          let dbTasks = snapshot.val();
+          let keys = Object.keys(dbTasks);
+          const taskMap = new Set(keys.map(key => dbTasks[key].category))
+          const fetchedTasks = [...taskMap].map(category => {
+            const data = keys.filter(key => dbTasks[key].category === category)
+            .map(key => {
+              return { id: key, name: dbTasks[key].name, image: dbTasks[key].image }
+            })
+            console.log('data', data)
+            var newArr = [];
+            while(data.length) newArr.push(data.splice(0,2));
+            
+            console.log(newArr)
+            return { category: category, tasks: newArr }
+          })
+          console.log('Fetched datas: ', fetchedTasks);
+          setTasks(fetchedTasks);    
+        });
+        // Stop listening for updates when no longer required
+        return () =>db.ref(`/users/${userId}`).off('value', onValueChange);
+    }, [userId]);
 
   return (
       <SafeAreaView style={styles.container}>
@@ -34,10 +58,10 @@ export default function TaskScreen({ navigation }) {
             }}
         />
         <Text style={styles.subtitle}>Next</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('InstructionScreen', {'task': 'Make Smoothie'} ) }>
+        <TouchableOpacity onPress={() => navigation.navigate('InstructionScreen', {task: 'Make Smoothie'} ) }>
           <Card  style={styles.highlight}>
           <CardItem cardBody>
-              <Image source={require('../../assets/images/smoothie.png')} style={{height: undefined, width: '50%', aspectRatio: 1}}/>
+              <Image source={require('../../assets/images/smoothie.png')} style={{height: undefined, width: '40%', aspectRatio: 1}}/>
             </CardItem>
             <CardItem cardBody>
                 <Text style={styles.buttonText}>Make Smoothie</Text>
@@ -46,16 +70,16 @@ export default function TaskScreen({ navigation }) {
         </TouchableOpacity>
         <ScrollView style={{marginBottom:100}}>
         {tasks.map((elem,i) => {
-        return (<View>
+        return (<View key={"category"+i}>
           <Text style={styles.subtitle}>{elem.category}</Text>
           {elem.tasks.map((taskRow,i)=>{
             return(
-            < View style={{flex :1, flexDirection: 'row'}}>
-{taskRow.map((task)=>{
-            return (<TouchableOpacity onPress={() => navigation.navigate('InstructionScreen', {'task': task.name}) }>
+            < View style={{flex :1, flexDirection: 'row'}} key={"categoryRow"+i}>
+            {taskRow.map((task,i)=>{
+            return (<TouchableOpacity key={"task"+i} onPress={() => navigation.navigate('InstructionScreen', {'task': task.name}) }>
                <Card  style={styles.tasks}>
                <CardItem cardBody>
-                     <Image source={task.image} style={{height: 100, width: null, flex: 1}}/>
+                     <Image source={{uri: task.image}} style={{height: 100, width: null, flex: 1}}/>
                    </CardItem>
                  <CardItem cardBody>
                      <Text style={styles.buttonText}>{task.name}</Text>
@@ -71,19 +95,6 @@ export default function TaskScreen({ navigation }) {
           )
         })}
           </ScrollView>
-
-        {/* < View style={{flex :1, flexDirection: 'row'}}>
-         <TouchableOpacity onPress={() => navigation.navigate('InstructionScreen') }>
-            <Card  style={styles.tasks}>
-            <CardItem cardBody>
-                  <Image source={require('../../assets/images/tasks.png')} style={{height: 50, width: null, flex: 1}}/>
-                </CardItem>
-              <CardItem cardBody>
-                  <Text style={styles.buttonText}>{e}</Text>
-                </CardItem>
-            </Card>
-          </TouchableOpacity>
-        </View>   */}
             <Button style={styles.backButton} onPress={() => navigation.navigate('Home') }>
           <Text style={styles.buttonText}><Entypo name="home" size={30} color="white"/> Back to HOME</Text>
         </Button>
@@ -96,9 +107,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#264653'
-    // alignItems: 'center',
-    // justifyContent: 'center',
-    // textAlign: 'center'
   },
   highlight: {
     height: 200,
@@ -128,7 +136,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginLeft: 20,
     marginTop:30,
-    fontFamily: 'Rubik'
+    fontFamily: 'Rubik',
+    textTransform: 'capitalize',
   },
   buttonText: {
     fontWeight: "bold",
