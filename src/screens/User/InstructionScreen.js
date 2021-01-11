@@ -1,31 +1,36 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text, Button, Card, CardItem } from 'native-base';
 import { SafeAreaView, StyleSheet, Dimensions, Image, TouchableOpacity, View } from 'react-native';
 import { Entypo } from '@expo/vector-icons'; 
 import { useFonts } from 'expo-font';
-import { hardcodedInstructions } from './HardcodedInstructions';
+// import { hardcodedInstructions } from './HardcodedInstructions';
 import ProgressBar from 'react-native-progress/Bar';
 import { Audio } from 'expo-av';
 
 const width = Dimensions.get('window').width
 
 export default function InstructionScreen({ navigation, route }) {
-    
+    console.log(route.params.instructions)
+    let [steps, setSteps] = useState([]);
+
     const [loaded] = useFonts({
         Rubik: require('../../assets/fonts/Rubik-Regular.ttf'),
     })
 
     const [currentStepNum, setCurrentStepNum] = useState(0);
 
-    if (!loaded) return null;
+    // if (!loaded) return null;
 
-    let steps = hardcodedInstructions[route.params.task];
-
+    useEffect(() => {
+        if(!!route.params.instructions){
+            setSteps(route.params.instructions)
+        }
+    }, [route])
     // play audio
     let soundObject = new Audio.Sound();
     let audioPromise = new Promise((resolve, reject) => {
-        soundObject.loadAsync(steps[currentStepNum].audio, { shouldPlay: true });
+        soundObject.loadAsync({uri: steps[currentStepNum].audio}, { shouldPlay: true });
         soundObject.setOnPlaybackStatusUpdate(status => {
             if (status.didJustFinish) {
                 if (currentStepNum <= steps.length - 2) {
@@ -37,7 +42,7 @@ export default function InstructionScreen({ navigation, route }) {
         });
     }).then(() => {
         soundObject.unloadAsync();
-    });
+    }).catch(console.log);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -52,7 +57,7 @@ export default function InstructionScreen({ navigation, route }) {
                     height: 1500,
                 }}
             />
-            <Text style={styles.title}>{route.params.task}</Text>
+            <Text style={styles.title}>{route.params.title}</Text>
 
             {steps.length > 0 ? <>
             <ProgressBar 
@@ -69,7 +74,7 @@ export default function InstructionScreen({ navigation, route }) {
 
             <Card style={styles.highlight}>
                 <CardItem cardBody>
-                        {steps[currentStepNum] != undefined && <Image source={steps[currentStepNum].image} 
+                        {steps[currentStepNum] != undefined && <Image source={{uri: steps[currentStepNum].image}} 
                         style={{ height: undefined, width: '50%', aspectRatio: 1 }} />}
                 </CardItem>
                 <CardItem cardBody>

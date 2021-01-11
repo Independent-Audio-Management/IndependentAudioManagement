@@ -15,9 +15,6 @@ export default function TaskScreen({ navigation }) {
       Rubik: require('../../assets/fonts/Rubik-Regular.ttf'),
   })
 
-    // const [tasks] = useState([{category: 'Morning', tasks: [[{name: 'Make Bed', image: require('../../assets/images/bed.png')}, {name: 'Brush Teeth', image: require('../../assets/images/toothbrush.png')}], 
-    // [{name: 'Wash Face', image: require('../../assets/images/washface.png')}, {name: 'Comb Hair', image: require('../../assets/images/combhair.png')}]]}, 
-    // {category: 'Motivators', tasks: [[{name: 'Make Smoothie', image: require('../../assets/images/smoothie.png')}, {name: 'Bake Cookies', image: require('../../assets/images/cookies.png')}]]}])
     useEffect(() => {
         const onValueChange = db.ref(`/users/${userId}/tasks`)
         .on('value', (snapshot) => {
@@ -28,7 +25,7 @@ export default function TaskScreen({ navigation }) {
           const fetchedTasks = [...taskMap].map(category => {
             const data = keys.filter(key => dbTasks[key].category === category)
             .map(key => {
-              return { id: key, name: dbTasks[key].name, image: dbTasks[key].image }
+              return { id: key, ...dbTasks[key] }
             })
             console.log('data', data)
             var newArr = [];
@@ -76,7 +73,7 @@ export default function TaskScreen({ navigation }) {
             return(
             < View style={{flex :1, flexDirection: 'row'}} key={"categoryRow"+i}>
             {taskRow.map((task,i)=>{
-            return (<TouchableOpacity key={"task"+i} onPress={() => navigation.navigate('InstructionScreen', {'task': task.name}) }>
+            return (<TouchableOpacity key={"task"+i} onPress={() => navigation.navigate('InstructionScreen', { instructions: task.instructions, title: task.name } ) }>
                <Card  style={styles.tasks}>
                <CardItem cardBody>
                      <Image source={{uri: task.image}} style={{height: 100, width: null, flex: 1}}/>
