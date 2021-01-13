@@ -5,6 +5,10 @@ import { useFonts } from "expo-font";
 import { Text, Button } from "native-base";
 import { Entypo } from "@expo/vector-icons";
 import { Audio } from "expo-av";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 export default function CongratsScreen({ navigation }) {
   const [loaded] = useFonts({
@@ -33,15 +37,14 @@ export default function CongratsScreen({ navigation }) {
           left: 0,
           right: 0,
           top: 0,
-          height: 1500,
+          height: hp("100%"),
         }}
       />
       <Text
         style={{
-          fontSize: 40,
+          fontSize: hp("5%"),
           color: "#fff",
-          marginLeft: 20,
-          marginTop: 70,
+          marginTop: hp("10%"),
           fontFamily: "Rubik",
         }}
       >
@@ -49,10 +52,9 @@ export default function CongratsScreen({ navigation }) {
       </Text>
       <Text
         style={{
-          fontSize: 25,
+          fontSize: hp("3%"),
           color: "#fff",
-          marginLeft: 35,
-          marginTop: 10,
+          marginTop: hp("2%"),
           fontFamily: "Rubik",
         }}
       >
@@ -63,9 +65,9 @@ export default function CongratsScreen({ navigation }) {
         source={require("../../assets/images/youdidit.png")}
         style={{
           height: undefined,
-          width: "100%",
+          width: wp("100%"),
           aspectRatio: 1,
-          marginTop: 40,
+          marginTop: hp("5%"),
         }}
       />
 
@@ -77,7 +79,7 @@ export default function CongratsScreen({ navigation }) {
         }}
       >
         <Text style={styles.buttonText}>
-          <Entypo name="reply" size={30} color="white" /> Back to TASKS
+          <Entypo name="reply" size={hp("5%")} color="white" /> Back to TASKS
         </Text>
       </Button>
     </SafeAreaView>
@@ -87,20 +89,19 @@ export default function CongratsScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // alignItems: 'center',
-    // justifyContent: 'center',
-    // textAlign: 'center'
+    alignItems: "center",
+    textAlign: "center",
   },
   buttonText: {
     fontWeight: "bold",
-    fontSize: 20,
+    fontSize: hp("4%"),
   },
   backButton: {
     position: "absolute",
     bottom: 0,
     left: 0,
-    width: "100%",
-    height: "12%",
+    width: wp("100%"),
+    height: hp("12%"),
     backgroundColor: "#2A9D8F",
     justifyContent: "center",
   },
