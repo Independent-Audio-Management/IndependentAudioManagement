@@ -1,12 +1,31 @@
 {
-  "name": "digitalInclusion",
-  "displayName": "digitalInclusion",
+  "name": "iAM",
+  "displayName": "iAM",
   "expo": {
-    "name": "digitalInclusion",
-    "slug": "digitalInclusion",
+    "name": "iAM",
+    "slug": "iAM",
     "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./src/assets/images/icon.png",
+    "splash": {
+      "image": "./src/assets/images/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/images/icon.png",
+        "backgroundColor": "#FFF"
+      }
+    },
+    "web": {
+      "favicon": "./src/assets/images/icon.png"
+    }
   }
 }

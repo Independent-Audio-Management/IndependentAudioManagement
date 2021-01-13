@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Text,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Dimensions,
-} from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { LinearGradient } from "expo-linear-gradient";
 import { Card, CardItem, Button } from "native-base";
@@ -48,7 +41,7 @@ export default function QRScreen({ navigation }) {
           <CardItem cardBody>
             <Image
               source={image}
-              style={{ width: wp("80%"), aspectRatio: 1 }}
+              style={{ width: wp("25%"), aspectRatio: 1 }}
             />
           </CardItem>
           <CardItem cardBody>
