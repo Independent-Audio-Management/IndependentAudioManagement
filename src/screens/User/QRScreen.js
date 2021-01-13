@@ -6,14 +6,15 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
-  SafeView,
 } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { LinearGradient } from "expo-linear-gradient";
 import { Card, CardItem, Button } from "native-base";
 import { Entypo } from "@expo/vector-icons";
-const width = Dimensions.get("window").width;
-const height = Dimensions.get("window").height;
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 export default function QRScreen({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
@@ -47,7 +48,7 @@ export default function QRScreen({ navigation }) {
           <CardItem cardBody>
             <Image
               source={image}
-              style={{ height: undefined, width: "80%", aspectRatio: 1 }}
+              style={{ width: wp("80%"), aspectRatio: 1 }}
             />
           </CardItem>
           <CardItem cardBody>
@@ -76,7 +77,7 @@ export default function QRScreen({ navigation }) {
           left: 0,
           right: 0,
           top: 0,
-          height: 1500,
+          height: hp("100%"),
         }}
       />
       <Text style={styles.title}>Scan QR</Text>
@@ -90,7 +91,7 @@ export default function QRScreen({ navigation }) {
         onPress={() => navigation.navigate("Home")}
       >
         <Text style={styles.title}>
-          <Entypo name="home" size={30} color="white" />
+          <Entypo name="home" size={hp("4%")} color="white" />
           Back to HOME
         </Text>
       </Button>
@@ -107,19 +108,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   scanner: {
-    width: width,
-    height: height / 2 - 50,
+    width: wp("100%"),
+    height: hp("50%"),
   },
   title: {
     fontWeight: "bold",
-    fontSize: 30,
+    fontSize: hp("4%"),
     color: "#fff",
     marginBottom: 30,
     // fontFamily: 'Rubik'
   },
   card: {
-    height: height / 6 + 20,
-    width: width / 3,
+    width: wp("33%"),
     margin: 0,
     paddingTop: 10,
     justifyContent: "center",
@@ -128,15 +128,15 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontWeight: "bold",
-    fontSize: 20,
+    fontSize: hp("1%"),
   },
   backButton: {
     position: "absolute",
     bottom: 0,
     left: 0,
     marginTop: 10,
-    width: "100%",
-    height: "12%",
+    width: wp("100%"),
+    height: hp("12%"),
     backgroundColor: "#F4A261",
     justifyContent: "center",
   },

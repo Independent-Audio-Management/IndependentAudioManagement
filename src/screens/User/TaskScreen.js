@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFonts } from "expo-font";
-import { Container, Card, CardItem, Text, Button } from "native-base";
+import { Card, CardItem, Text, Button } from "native-base";
 import { Image } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { db } from "../../utils/firebase";
