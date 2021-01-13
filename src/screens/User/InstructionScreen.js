@@ -4,7 +4,6 @@ import { Text, Button, Card, CardItem } from 'native-base';
 import { SafeAreaView, StyleSheet, Dimensions, Image, TouchableOpacity, View } from 'react-native';
 import { Entypo } from '@expo/vector-icons'; 
 import { useFonts } from 'expo-font';
-// import { hardcodedInstructions } from './HardcodedInstructions';
 import ProgressBar from 'react-native-progress/Bar';
 import { Audio } from 'expo-av';
 
@@ -27,6 +26,7 @@ export default function InstructionScreen({ navigation, route }) {
             setSteps(route.params.instructions)
         }
     }, [route])
+    
     // play audio
     let soundObject = new Audio.Sound();
     let audioPromise = new Promise((resolve, reject) => {

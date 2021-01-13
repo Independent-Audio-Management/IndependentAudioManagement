@@ -1,7 +1,7 @@
-import * as firebase from 'firebase';
-import 'firebase/auth';
+import * as firebase from "firebase";
+import "firebase/auth";
 
-import firebaseConfig from '../config/firebaseConfig';
+import firebaseConfig from "../config/firebaseConfig";
 
 // Initialize Firebase App
 if (!firebase.apps.length) {
@@ -20,4 +20,4 @@ export const registerWithEmail = (email, password) =>
 
 export const logout = () => auth.signOut();
 
-export const passwordReset = email => auth.sendPasswordResetEmail(email);
+export const passwordReset = (email) => auth.sendPasswordResetEmail(email);
