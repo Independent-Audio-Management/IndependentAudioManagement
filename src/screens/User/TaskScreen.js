@@ -13,7 +13,10 @@ import { Card, CardItem, Text, Button } from "native-base";
 import { Image } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { db } from "../../utils/firebase";
-const width = Dimensions.get("window").width;
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 export default function TaskScreen({ navigation }) {
   const [userId, settUserId] = useState("36112759-7710-4c22-b63b-8433b507f02e");
@@ -60,7 +63,7 @@ export default function TaskScreen({ navigation }) {
           left: 0,
           right: 0,
           top: 0,
-          height: 1500,
+          height: hp("100%"),
         }}
       />
       <Text style={styles.subtitle}>Next</Text>
@@ -73,7 +76,7 @@ export default function TaskScreen({ navigation }) {
           <CardItem cardBody>
             <Image
               source={require("../../assets/images/smoothie.png")}
-              style={{ height: undefined, width: "40%", aspectRatio: 1 }}
+              style={{ width: wp("40%"), aspectRatio: 1 }}
             />
           </CardItem>
           <CardItem cardBody>
@@ -107,7 +110,7 @@ export default function TaskScreen({ navigation }) {
                             <CardItem cardBody>
                               <Image
                                 source={{ uri: task.image }}
-                                style={{ height: 100, width: null, flex: 1 }}
+                                style={{ height: hp("12%"), flex: 1 }}
                               />
                             </CardItem>
                             <CardItem cardBody>
@@ -128,8 +131,8 @@ export default function TaskScreen({ navigation }) {
         style={styles.backButton}
         onPress={() => navigation.navigate("Home")}
       >
-        <Text style={styles.buttonText}>
-          <Entypo name="home" size={30} color="white" /> Back to HOME
+        <Text style={styles.backButtonText}>
+          <Entypo name="home" size={hp("4%")} color="white" /> Back to HOME
         </Text>
       </Button>
     </SafeAreaView>
@@ -142,8 +145,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#264653",
   },
   highlight: {
-    height: 200,
-    width: width - 40,
+    height: hp("22%"),
+    width: wp("92%"),
     marginLeft: 20,
     padding: 0,
     justifyContent: "center",
@@ -155,8 +158,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: -15, height: 15 },
   },
   tasks: {
-    height: 150,
-    width: width / 2 - 30,
+    height: hp("17%"),
+    width: wp("43%"),
     marginLeft: 20,
     padding: 0,
     justifyContent: "center",
@@ -165,7 +168,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     // fontWeight:"bold",
-    fontSize: 20,
+    fontSize: hp("3%"),
     color: "#fff",
     marginLeft: 20,
     marginTop: 30,
@@ -174,14 +177,18 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontWeight: "bold",
-    fontSize: 20,
+    fontSize: hp("2%"),
+  },
+  backButtonText: {
+    fontWeight: "bold",
+    fontSize: hp("4%"),
   },
   backButton: {
     position: "absolute",
     bottom: 0,
     left: 0,
-    width: "100%",
-    height: "12%",
+    width: wp("100%"),
+    height: hp("10%"),
     backgroundColor: "#F4A261",
     justifyContent: "center",
   },

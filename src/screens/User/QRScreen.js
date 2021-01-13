@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontWeight: "bold",
-    fontSize: hp("1%"),
+    fontSize: hp("2%"),
   },
   backButton: {
     position: "absolute",
