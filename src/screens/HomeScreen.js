@@ -8,6 +8,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { Entypo } from "@expo/vector-icons";
 
 export default function HomeScreen({ navigation }) {
   const [loaded] = useFonts({
@@ -30,13 +31,20 @@ export default function HomeScreen({ navigation }) {
           height: hp("100%"),
         }}
       />
+      <TouchableOpacity onPress={() => navigation.navigate("Admin")}>
+        <Card style={styles.adminButton}>
+          <Text style={styles.buttonText}>
+            <Entypo name="cw" size={30} color="orange" />
+          </Text>
+        </Card>
+      </TouchableOpacity>
       <Text style={styles.title}>Hello Gabe!</Text>
       <TouchableOpacity onPress={() => navigation.navigate("QR")}>
         <Card style={styles.card1}>
           <CardItem cardBody>
             <Image
               source={require("../assets/images/scanQR.png")}
-              style={{ width: wp("55%"), aspectRatio: 1 }}
+              style={{ width: wp("45%"), aspectRatio: 1 }}
             />
           </CardItem>
           <CardItem cardBody>
@@ -49,7 +57,7 @@ export default function HomeScreen({ navigation }) {
           <CardItem cardBody>
             <Image
               source={require("../assets/images/tasks.png")}
-              style={{ width: wp("55%"), aspectRatio: 1 }}
+              style={{ width: wp("45%"), aspectRatio: 1 }}
             />
           </CardItem>
           <CardItem cardBody>
@@ -95,6 +103,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 10,
     shadowOffset: { width: -15, height: 15 },
+  },
+  adminButton: {
+    height: 50,
+    width: 50,
+    borderRadius: 100,
   },
   title: {
     fontSize: hp("6%"),

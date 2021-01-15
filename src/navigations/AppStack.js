@@ -6,6 +6,7 @@ import TaskScreen from "../screens/User/TaskScreen";
 import { NavigationContainer } from "@react-navigation/native";
 import InstructionScreen from "../screens/User/InstructionScreen";
 import CongratsScreen from "../screens/User/CongratsScreen";
+import AdminLogin from "../screens/Admin/AdminLoginScreen";
 
 const Stack = createStackNavigator();
 
@@ -18,6 +19,7 @@ const AppStack = () => {
         <Stack.Screen name="Task" component={TaskScreen} />
         <Stack.Screen name="InstructionScreen" component={InstructionScreen} />
         <Stack.Screen name="CongratsScreen" component={CongratsScreen} />
+        <Stack.Screen name="Admin" component={AdminLogin} />
       </Stack.Navigator>
     </NavigationContainer>
   );
