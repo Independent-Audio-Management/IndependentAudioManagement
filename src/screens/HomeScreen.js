@@ -36,7 +36,7 @@ export default function HomeScreen({ navigation }) {
           <CardItem cardBody>
             <Image
               source={require("../assets/images/scanQR.png")}
-              style={{ width: wp("55%"), aspectRatio: 1 }}
+              style={{ width: hp("23%"), aspectRatio: 1 }}
             />
           </CardItem>
           <CardItem cardBody>
@@ -49,7 +49,7 @@ export default function HomeScreen({ navigation }) {
           <CardItem cardBody>
             <Image
               source={require("../assets/images/tasks.png")}
-              style={{ width: wp("55%"), aspectRatio: 1 }}
+              style={{ width: hp("23%"), aspectRatio: 1 }}
             />
           </CardItem>
           <CardItem cardBody>

@@ -4,14 +4,16 @@ import { BarCodeScanner } from "expo-barcode-scanner";
 import { LinearGradient } from "expo-linear-gradient";
 import { Card, CardItem, Button } from "native-base";
 import { Entypo } from "@expo/vector-icons";
+import { db } from "../../utils/firebase";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 
 export default function QRScreen({ navigation }) {
+  const [userId, settUserId] = useState("36112759-7710-4c22-b63b-8433b507f02e");
   const [hasPermission, setHasPermission] = useState(null);
-  const [scanned, setScanned] = useState(null);
+  const [taskComponent, setTaskComponent] = useState(null);
   const [task, setTask] = useState(null);
 
   useEffect(() => {
@@ -20,38 +22,37 @@ export default function QRScreen({ navigation }) {
       setHasPermission(status === "granted");
     })();
   }, []);
+
   const handleBarCodeScanned = ({ type, data }) => {
-    // const task = JSON.parse(data);
-    let image = require("../../assets/images/tasks.png");
+    db.ref(`/users/${userId}/tasks/${data}`).on("value", (snapshot) => {
+      let dbTask = snapshot.val();
+      if (dbTask != null) setTask({ id: data, ...dbTask });
+    });
 
-    if (data === "Brush Teeth")
-      image = require("../../assets/images/toothbrush.png");
-    else if (data === "Make Smoothie")
-      image = require("../../assets/images/smoothie.png");
-    else if (data === "Put Away Bag")
-      image = require("../../assets/images/tasks.png");
-
-    //   if(data != scanned){
-    // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-    setTask(
-      <TouchableOpacity
-        onPress={() => navigation.navigate("InstructionScreen", { task: data })}
-      >
-        <Card style={styles.card}>
-          <CardItem cardBody>
-            <Image
-              source={image}
-              style={{ width: wp("25%"), aspectRatio: 1 }}
-            />
-          </CardItem>
-          <CardItem cardBody>
-            <Text style={styles.buttonText}>{data}</Text>
-          </CardItem>
-        </Card>
-      </TouchableOpacity>
+    setTaskComponent(
+      task && (
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("InstructionScreen", {
+              instructions: task.instructions,
+              title: task.name,
+            })
+          }
+        >
+          <Card style={styles.card}>
+            <CardItem cardBody>
+              <Image
+                source={{ uri: task.image }}
+                style={{ width: wp("25%"), aspectRatio: 1 }}
+              />
+            </CardItem>
+            <CardItem cardBody>
+              <Text style={styles.buttonText}>{task.name}</Text>
+            </CardItem>
+          </Card>
+        </TouchableOpacity>
+      )
     );
-    setScanned(data);
-    //   }
   };
 
   if (hasPermission === null) {
@@ -78,7 +79,7 @@ export default function QRScreen({ navigation }) {
         onBarCodeScanned={handleBarCodeScanned}
         style={styles.scanner}
       />
-      {task}
+      {taskComponent}
       <Button
         style={styles.backButton}
         onPress={() => navigation.navigate("Home")}
