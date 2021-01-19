@@ -21,6 +21,7 @@ import {
 export default function TaskScreen({ navigation }) {
   const [userId, settUserId] = useState("36112759-7710-4c22-b63b-8433b507f02e");
   const [tasks, setTasks] = useState([]);
+  const [highlight, setHighlight] = useState({});
   const [loaded] = useFonts({
     Rubik: require("../../assets/fonts/Rubik-Regular.ttf"),
   });
@@ -29,29 +30,29 @@ export default function TaskScreen({ navigation }) {
     const onValueChange = db
       .ref(`/users/${userId}/tasks`)
       .on("value", (snapshot) => {
-        console.log("User datas: ", snapshot.val());
         let dbTasks = snapshot.val();
         let keys = Object.keys(dbTasks);
-        const taskMap = new Set(keys.map((key) => dbTasks[key].category));
-        const fetchedTasks = [...taskMap].map((category) => {
-          const data = keys
+        const categorySet = new Set(keys.map((key) => dbTasks[key].category));
+        const fetchedTasks = [...categorySet].map((category) => {
+          const task1d = keys
             .filter((key) => dbTasks[key].category === category)
             .map((key) => {
               return { id: key, ...dbTasks[key] };
             });
-          console.log("data", data);
-          var newArr = [];
-          while (data.length) newArr.push(data.splice(0, 2));
-
-          console.log(newArr);
-          return { category: category, tasks: newArr };
+          setHighlight(task1d[getRandomInt(task1d.length)]);
+          var tasks2d = [];
+          while (task1d.length) tasks2d.push(task1d.splice(0, 2));
+          return { category: category, tasks: tasks2d };
         });
-        console.log("Fetched datas: ", fetchedTasks);
         setTasks(fetchedTasks);
       });
     // Stop listening for updates when no longer required
     return () => db.ref(`/users/${userId}`).off("value", onValueChange);
   }, [userId]);
+
+  const getRandomInt = (max) => {
+    return Math.floor(Math.random() * Math.floor(max));
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -69,18 +70,21 @@ export default function TaskScreen({ navigation }) {
       <Text style={styles.subtitle}>Next</Text>
       <TouchableOpacity
         onPress={() =>
-          navigation.navigate("InstructionScreen", { task: "Make Smoothie" })
+          navigation.navigate("InstructionScreen", {
+            instructions: highlight.instructions,
+            title: highlight.name,
+          })
         }
       >
         <Card style={styles.highlight}>
           <CardItem cardBody>
             <Image
-              source={require("../../assets/images/smoothie.png")}
+              source={{ uri: highlight.image }}
               style={{ width: wp("40%"), aspectRatio: 1 }}
             />
           </CardItem>
           <CardItem cardBody>
-            <Text style={styles.buttonText}>Make Smoothie</Text>
+            <Text style={styles.buttonText}>{highlight.name}</Text>
           </CardItem>
         </Card>
       </TouchableOpacity>

@@ -62,7 +62,7 @@ export default function CongratsScreen({ navigation }) {
       </Text>
 
       <Image
-        source={require("../../assets/images/youdidit.png")}
+        source={require("../../assets/images/youdidit.gif")}
         style={{
           height: undefined,
           width: wp("100%"),
