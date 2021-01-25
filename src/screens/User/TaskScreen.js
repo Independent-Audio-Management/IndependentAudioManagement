@@ -41,6 +41,7 @@ export default function TaskScreen({ navigation }) {
             });
           setHighlight(task1d[getRandomInt(task1d.length)]);
           var tasks2d = [];
+          console.log(wp("100%"));
           while (task1d.length) tasks2d.push(task1d.splice(0, 2));
           return { category: category, tasks: tasks2d };
         });
@@ -80,7 +81,11 @@ export default function TaskScreen({ navigation }) {
           <CardItem cardBody>
             <Image
               source={{ uri: highlight.image }}
-              style={{ width: wp("40%"), aspectRatio: 1 }}
+              style={{
+                flex: 1,
+                aspectRatio: 3,
+                resizeMode: "contain",
+              }}
             />
           </CardItem>
           <CardItem cardBody>
@@ -114,7 +119,11 @@ export default function TaskScreen({ navigation }) {
                             <CardItem cardBody>
                               <Image
                                 source={{ uri: task.image }}
-                                style={{ height: hp("12%"), flex: 1 }}
+                                style={{
+                                  flex: 1,
+                                  aspectRatio: 2,
+                                  resizeMode: "contain",
+                                }}
                               />
                             </CardItem>
                             <CardItem cardBody>
@@ -163,7 +172,7 @@ const styles = StyleSheet.create({
   },
   tasks: {
     height: hp("17%"),
-    width: wp("43%"),
+    width: wp("42%"),
     marginLeft: 20,
     padding: 0,
     justifyContent: "center",

@@ -1,66 +1,91 @@
-import React, { useState, useEffect } from "react";
+import { Entypo } from "@expo/vector-icons";
+import { Audio } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
-import { Text, Button, Card, CardItem } from "native-base";
+import { Button, Card, CardItem, Text } from "native-base";
+import React, { useEffect, useState } from "react";
 import {
+  Image,
   SafeAreaView,
   StyleSheet,
-  Image,
   TouchableOpacity,
   View,
 } from "react-native";
-import { Entypo } from "@expo/vector-icons";
-import { useFonts } from "expo-font";
 import ProgressBar from "react-native-progress/Bar";
-import { Audio } from "expo-av";
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
 
 export default function InstructionScreen({ navigation, route }) {
-  console.log(route.params.instructions);
   let [steps, setSteps] = useState([]);
-
-  const [loaded] = useFonts({
-    Rubik: require("../../assets/fonts/Rubik-Regular.ttf"),
-  });
-
+  const [sound, setSound] = useState();
   const [currentStepNum, setCurrentStepNum] = useState(0);
 
   // if (!loaded) return null;
 
-  useEffect(() => {
+  useEffect(async () => {
     if (!!route.params.instructions) {
-      setSteps(route.params.instructions);
+      const loadedAudio = route.params.instructions.map(async (e) => {
+        console.log(e);
+        const { sound } = await Audio.Sound.createAsync(
+          { uri: e.audio },
+          { shouldPlay: true }
+        );
+        return { ...e, audio: sound };
+      });
+      setSteps(loadedAudio);
     }
   }, [route]);
 
-  // play audio
-  let soundObject = new Audio.Sound();
-  let audioPromise = new Promise((resolve, reject) => {
-    soundObject.loadAsync(
-      { uri: steps[currentStepNum].audio },
-      { shouldPlay: true }
-    );
-    soundObject.setOnPlaybackStatusUpdate((status) => {
-      if (status.didJustFinish) {
-        if (currentStepNum <= steps.length - 2) {
-          setTimeout(() => {
-            setCurrentStepNum((s) => s + 1);
-          }, 3000);
+  useEffect(() => {
+    return sound
+      ? () => {
+          console.log("Unloading Sound");
+          sound.unloadAsync();
         }
-      }
-    });
-  })
-    .then(() => {
-      soundObject.unloadAsync();
-    })
-    .catch(console.log);
+      : undefined;
+  }, [sound]);
+
+  // play audio
+  // let sound = new Audio.Sound;
+  // let audioPromise = new Promise((resolve, reject) => {
+  //   sound.loadAsync({ uri: steps[currentStepNum].audio }, { shouldPlay: true });
+  //   sound.setOnPlaybackStatusUpdate((status) => {
+  //     if (status.didJustFinish) {
+  //       if (currentStepNum <= steps.length - 2) {
+  //         setTimeout(() => {
+  //           setCurrentStepNum((s) => s + 1);
+  //         }, 3000);
+  //       }
+  //     }
+  //   });
+  // })
+  //   .then(() => {
+  //     sound.unloadAsync();
+  //   })
+  //   .catch(console.log);
+
+  //Tas Version of Playing Audio
+  const playSound = async () => {
+    // console.log("Loading Sound");
+    // const { sound } = await Audio.Sound.createAsync(
+    //   { uri: steps[currentStepNum].audio },
+    //   { shouldPlay: true }
+    // );
+    // setSound(sound);
+
+    console.log("Playing Sound");
+    await steps[currentStepNum].audio.playAsync();
+  };
+
+  const stopSound = async () => {
+    console.log("Stopping Sound");
+    await sound.stopAsync();
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient
-        // Background Linear Gradient
         colors={["#F4A261", "transparent"]}
         style={{
           position: "absolute",
@@ -77,7 +102,7 @@ export default function InstructionScreen({ navigation, route }) {
           <ProgressBar
             marginTop={10}
             marginLeft={14}
-            progress={currentStepNum / steps.length}
+            progress={currentStepNum / (steps.length - 1)}
             width={wp("90%")}
             color="#2A9D8F"
             backgroundColor={"#fff"}
@@ -85,7 +110,7 @@ export default function InstructionScreen({ navigation, route }) {
             height={hp("1%")}
           />
           <Text style={styles.progressPercentage}>
-            {Math.round((currentStepNum / steps.length) * 100)}% Done
+            {Math.round((currentStepNum / (steps.length - 1)) * 100)}% Done
           </Text>
 
           <Card style={styles.highlight}>
@@ -109,11 +134,7 @@ export default function InstructionScreen({ navigation, route }) {
             </CardItem>
           </Card>
 
-          <TouchableOpacity
-            onPress={() => {
-              soundObject.replayAsync();
-            }}
-          >
+          <TouchableOpacity onPress={playSound}>
             <Card style={styles.replayAudioCard}>
               <CardItem cardBody>
                 <Text style={styles.replayAudio}>
@@ -136,8 +157,8 @@ export default function InstructionScreen({ navigation, route }) {
                 onPress={() => {
                   // previous step button pressed
                   if (currentStepNum >= 1) {
-                    setCurrentStepNum((s) => s - 1);
-                    soundObject.stopAsync();
+                    setCurrentStepNum(currentStepNum - 1);
+                    stopSound;
                   }
                 }}
               >
@@ -152,7 +173,7 @@ export default function InstructionScreen({ navigation, route }) {
               <>
                 <TouchableOpacity
                   onPress={() => {
-                    soundObject.stopAsync();
+                    stopSound;
                     navigation.navigate("CongratsScreen");
                   }}
                 >
@@ -170,8 +191,8 @@ export default function InstructionScreen({ navigation, route }) {
               <TouchableOpacity
                 onPress={() => {
                   if (currentStepNum < steps.length - 1) {
-                    setCurrentStepNum((s) => s + 1);
-                    soundObject.stopAsync();
+                    setCurrentStepNum(currentStepNum + 1);
+                    stopSound;
                   }
                 }}
               >
@@ -190,7 +211,7 @@ export default function InstructionScreen({ navigation, route }) {
       <Button
         style={styles.backButton}
         onPress={() => {
-          soundObject.stopAsync();
+          stopSound;
           navigation.navigate("Task");
         }}
       >
@@ -214,10 +235,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 30,
-    shadowColor: "black",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: -15, height: 15 },
   },
   title: {
     // fontWeight:"bold",
@@ -262,10 +279,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 30,
-    shadowColor: "black",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: -15, height: 15 },
   },
   circleCard: {
     height: hp("18%"),
@@ -276,10 +289,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 90,
-    shadowColor: "black",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: -15, height: 15 },
   },
   stepText: {
     fontSize: hp("2%"),
