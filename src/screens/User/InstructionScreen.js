@@ -28,8 +28,8 @@ export default function InstructionScreen({ navigation, route }) {
       const loadedAudio = route.params.instructions.map(async (e) => {
         console.log(e);
         const { sound } = await Audio.Sound.createAsync(
-          { uri: e.audio },
-          { shouldPlay: true }
+          { uri: e.audio }
+          // { shouldPlay: true }
         );
         return { ...e, audio: sound };
       });
