@@ -18,7 +18,7 @@ import {
 } from "react-native-responsive-screen";
 
 export default function InstructionScreen({ navigation, route }) {
-  let [steps, setSteps] = useState([]);
+  let [steps, setSteps] = useState(route.params.instructions);
   let [playbackInstance, setPlaybackInstance] = useState(new Audio.Sound());
   let [currentIndex, setCurrentIndex] = useState(0);
   let [volume, setVolume] = useState(1.0);
@@ -30,24 +30,21 @@ export default function InstructionScreen({ navigation, route }) {
   });
 
   useEffect(() => {
-    if (!!route.params.instructions) {
-      setSteps(route.params.instructions);
-      Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-        playsInSilentModeIOS: true,
-        interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS,
-        shouldDuckAndroid: true,
-        staysActiveInBackground: true,
-        playThroughEarpieceAndroid: true,
-      });
-      loadAudio();
-    }
-  }, [route, currentIndex]);
+    Audio.setAudioModeAsync({
+      allowsRecordingIOS: false,
+      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+      playsInSilentModeIOS: true,
+      interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS,
+      shouldDuckAndroid: true,
+      staysActiveInBackground: true,
+      playThroughEarpieceAndroid: true,
+    });
+    loadAudio();
+  }, [currentIndex]);
 
-  const loadAudio = async () => {
+  const loadAudio = async (newPlaybackInstance, source) => {
     try {
-      const playbackInstance = new Audio.Sound();
+      const newPlaybackInstance = new Audio.Sound();
       const source = {
         uri: steps[currentIndex].audio,
       };
@@ -57,9 +54,9 @@ export default function InstructionScreen({ navigation, route }) {
         volume,
       };
 
-      playbackInstance.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
-      await playbackInstance.loadAsync(source, status, false);
-      setPlaybackInstance(playbackInstance);
+      newPlaybackInstance.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
+      await newPlaybackInstance.loadAsync(source, status, false);
+      setPlaybackInstance(newPlaybackInstance);
     } catch (e) {
       console.log(e);
     }
@@ -71,7 +68,6 @@ export default function InstructionScreen({ navigation, route }) {
       if (currentIndex <= steps.length - 2) {
         setTimeout(() => {
           setCurrentIndex(currentIndex + 1);
-          console.log("fml", currentIndex);
         }, 3000);
       }
     }
@@ -105,12 +101,6 @@ export default function InstructionScreen({ navigation, route }) {
     }
   };
 
-  const handleStopTrack = async () => {
-    isPlaying ? await playbackInstance.pauseAsync() : null;
-    if (playbackInstance) {
-      await playbackInstance.unloadAsync();
-    }
-  };
   // play audio
   // let soundObject = new Audio.Sound();
   // let audioPromise = new Promise((resolve, reject) => {
