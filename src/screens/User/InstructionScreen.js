@@ -1,61 +1,148 @@
-import React, { useState, useEffect } from "react";
+import { Entypo, Ionicons } from "@expo/vector-icons";
+import { Audio } from "expo-av";
+import { useFonts } from "expo-font";
 import { LinearGradient } from "expo-linear-gradient";
-import { Text, Button, Card, CardItem } from "native-base";
+import { Button, Card, CardItem, Text } from "native-base";
+import React, { useEffect, useState } from "react";
 import {
+  Image,
   SafeAreaView,
   StyleSheet,
-  Image,
   TouchableOpacity,
   View,
 } from "react-native";
-import { Entypo } from "@expo/vector-icons";
-import { useFonts } from "expo-font";
 import ProgressBar from "react-native-progress/Bar";
-import { Audio } from "expo-av";
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
 
 export default function InstructionScreen({ navigation, route }) {
-  console.log(route.params.instructions);
-  let [steps, setSteps] = useState([]);
+  let [steps, setSteps] = useState(route.params.instructions);
+  let [playbackInstance, setPlaybackInstance] = useState(new Audio.Sound());
+  let [currentIndex, setCurrentIndex] = useState(0);
+  let [volume, setVolume] = useState(1.0);
+  let [isBuffering, setIsBuffering] = useState(true);
+  let [isPlaying, setIsPlaying] = useState(true);
 
-  const [loaded] = useFonts({
+  useFonts({
     Rubik: require("../../assets/fonts/Rubik-Regular.ttf"),
   });
 
-  const [currentStepNum, setCurrentStepNum] = useState(0);
-
-  // if (!loaded) return null;
-
   useEffect(() => {
-    if (!!route.params.instructions) {
-      setSteps(route.params.instructions);
+    Audio.setAudioModeAsync({
+      allowsRecordingIOS: false,
+      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+      playsInSilentModeIOS: true,
+      interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS,
+      shouldDuckAndroid: true,
+      staysActiveInBackground: true,
+      playThroughEarpieceAndroid: true,
+    });
+    loadAudio();
+  }, [currentIndex]);
+
+  const loadAudio = async (newPlaybackInstance, source) => {
+    try {
+      const newPlaybackInstance = new Audio.Sound();
+      const source = {
+        uri: steps[currentIndex].audio,
+      };
+
+      const status = {
+        shouldPlay: isPlaying,
+        volume,
+      };
+
+      newPlaybackInstance.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
+      await newPlaybackInstance.loadAsync(source, status, false);
+      setPlaybackInstance(newPlaybackInstance);
+    } catch (e) {
+      console.log(e);
     }
-  }, [route]);
+  };
+
+  const onPlaybackStatusUpdate = (status) => {
+    setIsBuffering(isBuffering);
+    if (status.didJustFinish) {
+      if (currentIndex <= steps.length - 2) {
+        setTimeout(() => {
+          setCurrentIndex(currentIndex + 1);
+        }, 3000);
+      }
+    }
+  };
+
+  const handlePlayPause = async () => {
+    isPlaying
+      ? await playbackInstance.pauseAsync()
+      : await playbackInstance.playAsync();
+
+    setIsPlaying(!isPlaying);
+  };
+
+  const handlePreviousTrack = async () => {
+    if (playbackInstance) {
+      await playbackInstance.unloadAsync();
+      currentIndex < steps.length - 1
+        ? (currentIndex -= 1)
+        : (currentIndex = 0);
+      setCurrentIndex(currentIndex);
+    }
+  };
+
+  const handleNextTrack = async () => {
+    if (playbackInstance) {
+      await playbackInstance.unloadAsync();
+      currentIndex < steps.length - 1
+        ? (currentIndex += 1)
+        : (currentIndex = 0);
+      setCurrentIndex(currentIndex);
+    }
+  };
 
   // play audio
-  let soundObject = new Audio.Sound();
-  let audioPromise = new Promise((resolve, reject) => {
-    soundObject.loadAsync(
-      { uri: steps[currentStepNum].audio },
-      { shouldPlay: true }
-    );
-    soundObject.setOnPlaybackStatusUpdate((status) => {
-      if (status.didJustFinish) {
-        if (currentStepNum <= steps.length - 2) {
-          setTimeout(() => {
-            setCurrentStepNum((s) => s + 1);
-          }, 3000);
-        }
-      }
-    });
-  })
-    .then(() => {
-      soundObject.unloadAsync();
-    })
-    .catch(console.log);
+  // let soundObject = new Audio.Sound();
+  // let audioPromise = new Promise((resolve, reject) => {
+  //   soundObject.loadAsync(
+  //     { uri: steps[currentIndex].audio },
+  //     { shouldPlay: true }
+  //   );
+  //   soundObject.setOnPlaybackStatusUpdate((status) => {
+  //     if (status.didJustFinish) {
+  //       if (currentIndex <= steps.length - 2) {
+  //         setTimeout(() => {
+  //           setcurrentIndex(currentIndex + 1);
+  //         }, 3000);
+  //       }
+  //     }
+  //   });
+  // })
+  //   .then(() => {
+  //     soundObject.unloadAsync();
+  //   })
+  //   .catch(console.log);
+
+  const renderFileInfo = steps ? (
+    <Card style={styles.highlight}>
+      <CardItem cardBody>
+        {steps[currentIndex] != undefined && (
+          <Image
+            source={{ uri: steps[currentIndex].image }}
+            style={{
+              width: wp("50%"),
+              aspectRatio: 1,
+            }}
+          />
+        )}
+      </CardItem>
+      <CardItem cardBody>
+        {steps[currentIndex] != undefined && (
+          <Text style={styles.cardText}>{steps[currentIndex].text}</Text>
+        )}
+      </CardItem>
+    </Card>
+  ) : null;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -77,7 +164,7 @@ export default function InstructionScreen({ navigation, route }) {
           <ProgressBar
             marginTop={10}
             marginLeft={14}
-            progress={currentStepNum / steps.length}
+            progress={currentIndex / (steps.length - 1)}
             width={wp("90%")}
             color="#2A9D8F"
             backgroundColor={"#fff"}
@@ -85,46 +172,80 @@ export default function InstructionScreen({ navigation, route }) {
             height={hp("1%")}
           />
           <Text style={styles.progressPercentage}>
-            {Math.round((currentStepNum / steps.length) * 100)}% Done
+            {Math.round((currentIndex / (steps.length - 1)) * 100)}% Done
           </Text>
-
-          <Card style={styles.highlight}>
-            <CardItem cardBody>
-              {steps[currentStepNum] != undefined && (
-                <Image
-                  source={{ uri: steps[currentStepNum].image }}
-                  style={{
-                    width: wp("45%"),
-                    aspectRatio: 1,
-                  }}
+          {renderFileInfo}
+          <View style={styles.controls}>
+            <TouchableOpacity
+              onPress={() => {
+                soundObject.replayAsync();
+              }}
+            >
+              <Card style={styles.replayAudioCard}>
+                <CardItem cardBody>
+                  <Text style={styles.replayAudio}>
+                    <Entypo name="cw" size={30} color="black" /> Replay Audio
+                  </Text>
+                </CardItem>
+              </Card>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.controls}>
+            <TouchableOpacity
+              style={currentIndex === 0 ? styles.disabled : styles.control}
+              onPress={handlePreviousTrack}
+              disabled={currentIndex === 0}
+            >
+              <Ionicons
+                name="ios-skip-backward"
+                size={wp("20%")}
+                color="#444"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.control} onPress={handlePlayPause}>
+              {isPlaying ? (
+                <Ionicons name="ios-pause" size={wp("20%")} color="#444" />
+              ) : (
+                <Ionicons
+                  name="ios-play-circle"
+                  size={wp("20%")}
+                  color="#444"
                 />
               )}
-            </CardItem>
-            <CardItem cardBody>
-              {steps[currentStepNum] != undefined && (
-                <Text style={styles.cardText}>
-                  {steps[currentStepNum].text}
-                </Text>
-              )}
-            </CardItem>
-          </Card>
-
-          <TouchableOpacity
-            onPress={() => {
-              soundObject.replayAsync();
-            }}
-          >
-            <Card style={styles.replayAudioCard}>
-              <CardItem cardBody>
-                <Text style={styles.replayAudio}>
-                  <Entypo name="cw" size={30} color="black" /> Replay Audio
-                </Text>
-              </CardItem>
-            </Card>
-          </TouchableOpacity>
-
-          <View style={{ flex: 1, flexDirection: "row" }}>
-            {currentStepNum == 0 ? (
+            </TouchableOpacity>
+            {currentIndex == steps.length - 1 ? (
+              <>
+                <TouchableOpacity
+                  onPress={() => {
+                    playbackInstance.stopAsync();
+                    navigation.navigate("CongratsScreen");
+                  }}
+                >
+                  <Card
+                    style={{ ...styles.circleCard, backgroundColor: "green" }}
+                  >
+                    <Entypo name="check" size={wp("10%")} color="white" />
+                    <Text style={{ ...styles.stepText, color: "#fff" }}>
+                      Task Done
+                    </Text>
+                  </Card>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <TouchableOpacity
+                style={styles.control}
+                onPress={handleNextTrack}
+              >
+                <Ionicons
+                  name="ios-skip-forward"
+                  size={wp("20%")}
+                  color="#444"
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+          {/* <View style={{ flex: 1, flexDirection: "row" }}>
+            {currentIndex == 0 ? (
               <>
                 <Card style={{ ...styles.circleCard, backgroundColor: "gray" }}>
                   <Entypo name="arrow-bold-left" size={50} color="black" />
@@ -135,8 +256,8 @@ export default function InstructionScreen({ navigation, route }) {
               <TouchableOpacity
                 onPress={() => {
                   // previous step button pressed
-                  if (currentStepNum >= 1) {
-                    setCurrentStepNum((s) => s - 1);
+                  if (currentIndex >= 1) {
+                    setcurrentIndex(currentIndex - 1);
                     soundObject.stopAsync();
                   }
                 }}
@@ -148,7 +269,7 @@ export default function InstructionScreen({ navigation, route }) {
               </TouchableOpacity>
             )}
 
-            {currentStepNum == steps.length - 1 ? (
+            {currentIndex == steps.length - 1 ? (
               <>
                 <TouchableOpacity
                   onPress={() => {
@@ -169,8 +290,8 @@ export default function InstructionScreen({ navigation, route }) {
             ) : (
               <TouchableOpacity
                 onPress={() => {
-                  if (currentStepNum < steps.length - 1) {
-                    setCurrentStepNum((s) => s + 1);
+                  if (currentIndex < steps.length - 1) {
+                    setcurrentIndex(currentIndex + 1);
                     soundObject.stopAsync();
                   }
                 }}
@@ -181,7 +302,7 @@ export default function InstructionScreen({ navigation, route }) {
                 </Card>
               </TouchableOpacity>
             )}
-          </View>
+          </View> */}
         </>
       ) : (
         <></>
@@ -190,7 +311,8 @@ export default function InstructionScreen({ navigation, route }) {
       <Button
         style={styles.backButton}
         onPress={() => {
-          soundObject.stopAsync();
+          playbackInstance.stopAsync();
+          playbackInstance.unloadAsync();
           navigation.navigate("Task");
         }}
       >
@@ -205,8 +327,11 @@ export default function InstructionScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: "center",
+    // justifyContent: "center",
   },
   highlight: {
+    flex: 0.75,
     height: hp("25%"),
     width: wp("90%"),
     marginLeft: 20,
@@ -214,10 +339,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 30,
-    shadowColor: "black",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: -15, height: 15 },
   },
   title: {
     // fontWeight:"bold",
@@ -247,7 +368,8 @@ const styles = StyleSheet.create({
     marginLeft: wp("4%"),
   },
   cardText: {
-    fontSize: hp("2%"),
+    textAlign: "center",
+    fontSize: hp("3%"),
   },
   replayAudio: {
     fontSize: hp("3%"),
@@ -262,26 +384,36 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 30,
-    shadowColor: "black",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: -15, height: 15 },
   },
   circleCard: {
-    height: hp("18%"),
-    width: wp("42%"),
+    height: hp("11%"),
+    width: wp("30%"),
     marginLeft: 22,
     marginTop: 8,
     padding: 0,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 90,
-    shadowColor: "black",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: -15, height: 15 },
   },
   stepText: {
     fontSize: hp("2%"),
+  },
+  albumCover: {
+    width: 250,
+    height: 250,
+  },
+  controls: {
+    flexDirection: "row",
+  },
+  control: {
+    margin: 20,
+  },
+  disabled: {
+    margin: 20,
+    color: "red",
+  },
+  albumCover: {
+    width: wp("75%"),
+    height: hp("25%"),
   },
 });
