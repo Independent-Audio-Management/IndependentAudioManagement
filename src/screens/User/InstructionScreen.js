@@ -43,13 +43,11 @@ export default function InstructionScreen({ navigation, route }) {
       });
       loadAudio();
     }
-  }, [route]);
+  }, [route, currentIndex]);
 
   const loadAudio = async () => {
     try {
       const playbackInstance = new Audio.Sound();
-      console.log("STEPS", steps[currentIndex].audio);
-      console.log("currrent", currentIndex);
       const source = {
         uri: steps[currentIndex].audio,
       };
@@ -68,7 +66,6 @@ export default function InstructionScreen({ navigation, route }) {
   };
 
   const onPlaybackStatusUpdate = (status) => {
-    console.log("ttest");
     setIsBuffering(isBuffering);
     if (status.didJustFinish) {
       if (currentIndex <= steps.length - 2) {
@@ -95,7 +92,6 @@ export default function InstructionScreen({ navigation, route }) {
         ? (currentIndex -= 1)
         : (currentIndex = 0);
       setCurrentIndex(currentIndex);
-      loadAudio();
     }
   };
 
@@ -106,7 +102,6 @@ export default function InstructionScreen({ navigation, route }) {
         ? (currentIndex += 1)
         : (currentIndex = 0);
       setCurrentIndex(currentIndex);
-      loadAudio();
     }
   };
   // play audio
@@ -319,7 +314,7 @@ export default function InstructionScreen({ navigation, route }) {
       <Button
         style={styles.backButton}
         onPress={() => {
-          // soundObject.stopAsync();
+          playbackInstance.stopAsync();
           navigation.navigate("Task");
         }}
       >
