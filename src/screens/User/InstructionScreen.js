@@ -104,6 +104,13 @@ export default function InstructionScreen({ navigation, route }) {
       setCurrentIndex(currentIndex);
     }
   };
+
+  const handleStopTrack = async () => {
+    isPlaying ? await playbackInstance.pauseAsync() : null;
+    if (playbackInstance) {
+      await playbackInstance.unloadAsync();
+    }
+  };
   // play audio
   // let soundObject = new Audio.Sound();
   // let audioPromise = new Promise((resolve, reject) => {
@@ -315,6 +322,7 @@ export default function InstructionScreen({ navigation, route }) {
         style={styles.backButton}
         onPress={() => {
           playbackInstance.stopAsync();
+          playbackInstance.unloadAsync();
           navigation.navigate("Task");
         }}
       >
