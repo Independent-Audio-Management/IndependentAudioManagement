@@ -101,6 +101,14 @@ export default function InstructionScreen({ navigation, route }) {
     }
   };
 
+  const handleReplay = async () => {
+    if (!isPlaying) {
+      setIsPlaying(!isPlaying);
+      await playbackInstance.replayAsync();
+    }
+    await playbackInstance.replayAsync();
+  };
+
   // play audio
   // let soundObject = new Audio.Sound();
   // let audioPromise = new Promise((resolve, reject) => {
@@ -176,11 +184,7 @@ export default function InstructionScreen({ navigation, route }) {
           </Text>
           {renderFileInfo}
           <View style={styles.controls}>
-            <TouchableOpacity
-              onPress={() => {
-                soundObject.replayAsync();
-              }}
-            >
+            <TouchableOpacity onPress={handleReplay}>
               <Card style={styles.replayAudioCard}>
                 <CardItem cardBody>
                   <Text style={styles.replayAudio}>
