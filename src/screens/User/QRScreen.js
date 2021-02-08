@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { Entypo } from "@expo/vector-icons";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { LinearGradient } from "expo-linear-gradient";
-import { Card, CardItem, Button } from "native-base";
-import { Entypo } from "@expo/vector-icons";
-import { db } from "../../utils/firebase";
+import { Button, Card, CardItem } from "native-base";
+import React, { useEffect, useState } from "react";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
+import { db } from "../../utils/firebase";
 
 export default function QRScreen({ navigation }) {
   const [userId, settUserId] = useState("36112759-7710-4c22-b63b-8433b507f02e");
@@ -17,10 +17,16 @@ export default function QRScreen({ navigation }) {
   const [task, setTask] = useState(null);
 
   useEffect(() => {
-    (async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === "granted");
-    })();
+    let unmounted = false;
+    if (!unmounted) {
+      (async () => {
+        const { status } = await BarCodeScanner.requestPermissionsAsync();
+        setHasPermission(status === "granted");
+      })();
+    }
+    return () => {
+      unmounted = true;
+    };
   }, []);
 
   const handleBarCodeScanned = ({ type, data }) => {
