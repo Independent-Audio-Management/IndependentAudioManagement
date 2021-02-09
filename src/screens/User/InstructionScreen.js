@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import ProgressCircle from "react-native-progress-circle";
 import ProgressBar from "react-native-progress/Bar";
 import {
   heightPercentageToDP as hp,
@@ -68,7 +69,10 @@ export default function InstructionScreen({ navigation, route }) {
   };
 
   useEffect(() => {
-    if (!timeLeft) setCurrentIndex(currentIndex + 1);
+    if (!timeLeft) {
+      if (!currentIndex <= steps.length - 2) return;
+      setCurrentIndex(currentIndex + 1);
+    }
     const intervalId = setInterval(() => {
       setTimeLeft(timeLeft - (isPlaying ? 1 : 0));
     }, 1000);
@@ -164,7 +168,7 @@ export default function InstructionScreen({ navigation, route }) {
 
       {steps.length > 0 ? (
         <>
-          <ProgressBar
+          {/* <ProgressBar
             marginTop={10}
             marginLeft={14}
             progress={currentIndex / (steps.length - 1)}
@@ -176,7 +180,7 @@ export default function InstructionScreen({ navigation, route }) {
           />
           <Text style={styles.progressPercentage}>
             {Math.round((currentIndex / (steps.length - 1)) * 100)}% Done
-          </Text>
+          </Text> */}
           {renderFileInfo}
           <View style={styles.controls}>
             <TouchableOpacity onPress={handleReplay}>
@@ -201,18 +205,47 @@ export default function InstructionScreen({ navigation, route }) {
                 color="#444"
               />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.control} onPress={handlePlayPause}>
-              {isPlaying ? (
-                <Ionicons name="ios-pause" size={wp("20%")} color="#444" />
-              ) : (
-                <Ionicons
-                  name="ios-play-circle"
-                  size={wp("20%")}
-                  color="#444"
-                />
-              )}
-            </TouchableOpacity>
             {currentIndex == steps.length - 1 ? (
+              <TouchableOpacity
+                onPress={() => {
+                  playbackInstance.stopAsync();
+                  navigation.navigate("CongratsScreen");
+                }}
+              >
+                <Card
+                  style={{ ...styles.circleCard, backgroundColor: "green" }}
+                >
+                  <Entypo name="check" size={wp("10%")} color="white" />
+                  <Text style={{ ...styles.stepText, color: "#fff" }}>
+                    Task Done
+                  </Text>
+                </Card>
+              </TouchableOpacity>
+            ) : (
+              <ProgressCircle
+                percent={(currentIndex / (steps.length - 1)) * 100}
+                radius={50}
+                borderWidth={8}
+                color="#2A9D8F"
+                shadowColor="#999"
+                bgColor="#fff"
+              >
+                {/* <Text style={{ fontSize: 18 }}>{`${
+                (currentIndex / (steps.length - 1)) * 100
+              }%`}</Text> */}
+                <TouchableOpacity
+                  style={styles.playpause}
+                  onPress={handlePlayPause}
+                >
+                  {isPlaying ? (
+                    <Ionicons name="ios-pause" size={wp("15%")} color="#444" />
+                  ) : (
+                    <Ionicons name="ios-play" size={wp("15%")} color="#444" />
+                  )}
+                </TouchableOpacity>
+              </ProgressCircle>
+            )}
+            {/* {currentIndex == steps.length - 1 ? (
               <>
                 <TouchableOpacity
                   onPress={() => {
@@ -230,18 +263,11 @@ export default function InstructionScreen({ navigation, route }) {
                   </Card>
                 </TouchableOpacity>
               </>
-            ) : (
-              <TouchableOpacity
-                style={styles.control}
-                onPress={handleNextTrack}
-              >
-                <Ionicons
-                  name="ios-skip-forward"
-                  size={wp("20%")}
-                  color="#444"
-                />
-              </TouchableOpacity>
-            )}
+            ) : ( */}
+            <TouchableOpacity style={styles.control} onPress={handleNextTrack}>
+              <Ionicons name="ios-skip-forward" size={wp("20%")} color="#444" />
+            </TouchableOpacity>
+            {/* )} */}
           </View>
           <ProgressBar
             marginTop={5}
@@ -341,13 +367,13 @@ const styles = StyleSheet.create({
   },
   circleCard: {
     height: hp("11%"),
-    width: wp("30%"),
+    width: wp("25%"),
     marginLeft: 22,
     marginTop: 8,
     padding: 0,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 90,
+    borderRadius: 100,
   },
   stepText: {
     fontSize: hp("2%"),
@@ -361,6 +387,10 @@ const styles = StyleSheet.create({
   },
   control: {
     margin: 20,
+  },
+  playpause: {
+    margin: 0,
+    marginRight: 0,
   },
   disabled: {
     margin: 20,
