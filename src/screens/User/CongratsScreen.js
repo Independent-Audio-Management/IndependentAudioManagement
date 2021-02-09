@@ -1,13 +1,12 @@
-import React from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import { SafeAreaView, StyleSheet, Image } from "react-native";
-import { useFonts } from "expo-font";
-import { Text, Button } from "native-base";
-import { Entypo } from "@expo/vector-icons";
 import { Audio } from "expo-av";
+import { useFonts } from "expo-font";
+import { LinearGradient } from "expo-linear-gradient";
+import { Button, Text } from "native-base";
+import React from "react";
+import { Image, SafeAreaView, StyleSheet } from "react-native";
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
 
 export default function CongratsScreen({ navigation }) {
@@ -78,9 +77,17 @@ export default function CongratsScreen({ navigation }) {
           navigation.navigate("Task");
         }}
       >
-        <Text style={styles.buttonText}>
-          <Entypo name="reply" size={hp("5%")} color="white" /> Back to TASKS
-        </Text>
+        <Image
+          source={require("../../assets/icons/back.png")}
+          fadeDuration={0}
+          style={{
+            width: wp("10%"),
+            aspectRatio: 1,
+            resizeMode: "contain",
+            marginRight: 10,
+          }}
+        />
+        <Text style={styles.buttonText}>Back to TASKS</Text>
       </Button>
     </SafeAreaView>
   );
