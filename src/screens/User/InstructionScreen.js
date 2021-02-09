@@ -44,6 +44,7 @@ export default function InstructionScreen({ navigation, route }) {
       staysActiveInBackground: true,
       playThroughEarpieceAndroid: true,
     });
+    console.log("change");
     loadAudio();
     setTimeLeft(steps[currentIndex].duration);
   }, [currentIndex]);
@@ -69,8 +70,11 @@ export default function InstructionScreen({ navigation, route }) {
   };
 
   useEffect(() => {
-    if (!timeLeft) {
-      if (!currentIndex <= steps.length - 2) return;
+    console.log(timeLeft);
+    if (timeLeft === 0) {
+      console.log("enter", !(currentIndex <= steps.length - 2));
+      if (!(currentIndex <= steps.length - 2)) return;
+      console.log("changeer");
       setCurrentIndex(currentIndex + 1);
     }
     const intervalId = setInterval(() => {
