@@ -1,4 +1,4 @@
-import { Entypo, Ionicons } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 import { useFonts } from "expo-font";
 import { LinearGradient } from "expo-linear-gradient";
@@ -168,26 +168,14 @@ export default function InstructionScreen({ navigation, route }) {
 
       {steps.length > 0 ? (
         <>
-          {/* <ProgressBar
-            marginTop={10}
-            marginLeft={14}
-            progress={currentIndex / (steps.length - 1)}
-            width={wp("90%")}
-            color="#2A9D8F"
-            backgroundColor={"#fff"}
-            borderWidth={0}
-            height={hp("1%")}
-          />
-          <Text style={styles.progressPercentage}>
-            {Math.round((currentIndex / (steps.length - 1)) * 100)}% Done
-          </Text> */}
           {renderFileInfo}
           <View style={styles.controls}>
             <TouchableOpacity onPress={handleReplay}>
               <Card style={styles.replayAudioCard}>
                 <CardItem cardBody>
                   <Text style={styles.replayAudio}>
-                    <Entypo name="cw" size={30} color="black" /> Replay Audio
+                    {/* <Entypo name="cw" size={30} color="black" /> Replay Audio */}
+                    Replay Audio
                   </Text>
                 </CardItem>
               </Card>
@@ -199,78 +187,96 @@ export default function InstructionScreen({ navigation, route }) {
               onPress={handlePreviousTrack}
               disabled={currentIndex === 0}
             >
-              <Ionicons
-                name="ios-skip-backward"
-                size={wp("20%")}
-                color="#444"
+              <Image
+                source={
+                  currentIndex === 0
+                    ? require("../../assets/icons/disablePrevious.png")
+                    : require("../../assets/icons/previous.png")
+                }
+                fadeDuration={0}
+                style={{
+                  width: wp("15%"),
+                  height: wp("15%"),
+                  marginTop: 10,
+                  marginRight: 5,
+                }}
               />
             </TouchableOpacity>
-            {currentIndex == steps.length - 1 ? (
-              <TouchableOpacity
-                onPress={() => {
-                  playbackInstance.stopAsync();
-                  navigation.navigate("CongratsScreen");
-                }}
-              >
-                <Card
-                  style={{ ...styles.circleCard, backgroundColor: "green" }}
-                >
-                  <Entypo name="check" size={wp("10%")} color="white" />
-                  <Text style={{ ...styles.stepText, color: "#fff" }}>
-                    Task Done
-                  </Text>
-                </Card>
-              </TouchableOpacity>
-            ) : (
-              <ProgressCircle
-                percent={(currentIndex / (steps.length - 1)) * 100}
-                radius={50}
-                borderWidth={8}
-                color="#2A9D8F"
-                shadowColor="#999"
-                bgColor="#fff"
-              >
-                {/* <Text style={{ fontSize: 18 }}>{`${
-                (currentIndex / (steps.length - 1)) * 100
-              }%`}</Text> */}
-                <TouchableOpacity
-                  style={styles.playpause}
-                  onPress={handlePlayPause}
-                >
-                  {isPlaying ? (
-                    <Ionicons name="ios-pause" size={wp("15%")} color="#444" />
-                  ) : (
-                    <Ionicons name="ios-play" size={wp("15%")} color="#444" />
-                  )}
-                </TouchableOpacity>
-              </ProgressCircle>
-            )}
-            {/* {currentIndex == steps.length - 1 ? (
-              <>
+            <ProgressCircle
+              percent={(currentIndex / (steps.length - 1)) * 100}
+              radius={50}
+              borderWidth={8}
+              color="#2A9D8F"
+              shadowColor="#999"
+              bgColor={currentIndex == steps.length - 1 ? "#2A9D8F" : "#FFF"}
+            >
+              {currentIndex == steps.length - 1 ? (
                 <TouchableOpacity
                   onPress={() => {
                     playbackInstance.stopAsync();
                     navigation.navigate("CongratsScreen");
                   }}
+                  style={styles.playpause}
                 >
-                  <Card
-                    style={{ ...styles.circleCard, backgroundColor: "green" }}
-                  >
-                    <Entypo name="check" size={wp("10%")} color="white" />
-                    <Text style={{ ...styles.stepText, color: "#fff" }}>
-                      Task Done
-                    </Text>
-                  </Card>
+                  <Image
+                    source={require("../../assets/icons/check.png")}
+                    style={{
+                      width: wp("20%"),
+                      height: wp("10%"),
+                      aspectRatio: 1,
+                    }}
+                    fadeDuration={0}
+                  />
                 </TouchableOpacity>
-              </>
-            ) : ( */}
-            <TouchableOpacity style={styles.control} onPress={handleNextTrack}>
-              <Ionicons name="ios-skip-forward" size={wp("20%")} color="#444" />
+              ) : (
+                <TouchableOpacity
+                  style={styles.playpause}
+                  onPress={handlePlayPause}
+                >
+                  {isPlaying ? (
+                    <Image
+                      source={require("../../assets/icons/pause.png")}
+                      style={styles.pause}
+                      fadeDuration={0}
+                    />
+                  ) : (
+                    <Image
+                      source={require("../../assets/icons/play.png")}
+                      fadeDuration={0}
+                      style={styles.play}
+                    />
+                  )}
+                </TouchableOpacity>
+              )}
+            </ProgressCircle>
+            <TouchableOpacity
+              style={
+                currentIndex === steps.length - 1
+                  ? styles.disabled
+                  : styles.control
+              }
+              onPress={handleNextTrack}
+              disabled={currentIndex === steps.length - 1}
+            >
+              {/* <Ionicons name="ios-skip-forward" size={wp("20%")} color="#444" /> */}
+              <Image
+                source={
+                  currentIndex === steps.length - 1
+                    ? require("../../assets/icons/disableNext.png")
+                    : require("../../assets/icons/next.png")
+                }
+                fadeDuration={0}
+                style={{
+                  width: wp("15%"),
+                  height: wp("15%"),
+                  marginTop: 10,
+                  marginLeft: 5,
+                }}
+              />
             </TouchableOpacity>
-            {/* )} */}
           </View>
           <ProgressBar
-            marginTop={5}
+            marginTop={15}
             marginLeft={14}
             progress={
               (steps[currentIndex].duration - timeLeft) /
@@ -282,7 +288,6 @@ export default function InstructionScreen({ navigation, route }) {
             borderWidth={0}
             height={hp("1%")}
           />
-          {/* <Text>{timeLeft}</Text> */}
         </>
       ) : (
         <></>
@@ -386,15 +391,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   control: {
-    margin: 20,
+    margin: 10,
   },
-  playpause: {
-    margin: 0,
-    marginRight: 0,
+  pause: {
+    width: wp("10%"),
+    height: wp("10%"),
+  },
+  play: {
+    width: wp("10%"),
+    height: wp("10%"),
+    marginLeft: 8,
   },
   disabled: {
-    margin: 20,
-    color: "red",
+    margin: 10,
   },
   albumCover: {
     width: wp("75%"),
