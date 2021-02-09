@@ -4,6 +4,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "web": "expo start --web",
+    "prod": "expo start --no-dev --minify",
     "start": "expo start",
     "test": "jest"
   },
