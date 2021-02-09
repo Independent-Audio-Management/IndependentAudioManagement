@@ -1,4 +1,3 @@
-import { Entypo } from "@expo/vector-icons";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { LinearGradient } from "expo-linear-gradient";
 import { Button, Card, CardItem } from "native-base";
@@ -90,10 +89,18 @@ export default function QRScreen({ navigation }) {
         style={styles.backButton}
         onPress={() => navigation.navigate("Home")}
       >
-        <Text style={styles.title}>
-          <Entypo name="home" size={hp("4%")} color="white" />
-          Back to HOME
-        </Text>
+        <Image
+          source={require("../../assets/icons/home.png")}
+          fadeDuration={0}
+          style={{
+            width: wp("10%"),
+            aspectRatio: 1,
+            resizeMode: "contain",
+            marginBottom: 35,
+            marginRight: 10,
+          }}
+        />
+        <Text style={styles.title}>Back to HOME</Text>
       </Button>
     </View>
   );

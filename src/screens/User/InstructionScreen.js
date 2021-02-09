@@ -1,4 +1,3 @@
-import { Entypo } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 import { useFonts } from "expo-font";
 import { LinearGradient } from "expo-linear-gradient";
@@ -141,8 +140,9 @@ export default function InstructionScreen({ navigation, route }) {
           <Image
             source={{ uri: steps[currentIndex].image }}
             style={{
-              width: wp("50%"),
+              width: wp("75%"),
               aspectRatio: 1,
+              resizeMode: "contain",
             }}
           />
         )}
@@ -177,10 +177,17 @@ export default function InstructionScreen({ navigation, route }) {
             <TouchableOpacity onPress={handleReplay}>
               <Card style={styles.replayAudioCard}>
                 <CardItem cardBody>
-                  <Text style={styles.replayAudio}>
-                    {/* <Entypo name="cw" size={30} color="black" /> Replay Audio */}
-                    Replay Audio
-                  </Text>
+                  <Image
+                    source={require("../../assets/icons/replay.png")}
+                    fadeDuration={0}
+                    style={{
+                      width: wp("10%"),
+                      marginRight: 10,
+                      aspectRatio: 1,
+                      resizeMode: "contain",
+                    }}
+                  />
+                  <Text style={styles.replayAudio}>Replay Audio</Text>
                 </CardItem>
               </Card>
             </TouchableOpacity>
@@ -305,9 +312,16 @@ export default function InstructionScreen({ navigation, route }) {
           navigation.navigate("Task");
         }}
       >
-        <Text style={styles.buttonText}>
-          <Entypo name="reply" size={30} color="white" /> Back to TASKS
-        </Text>
+        <Image
+          source={require("../../assets/icons/back.png")}
+          fadeDuration={0}
+          style={{
+            width: wp("10%"),
+            aspectRatio: 1,
+            resizeMode: "contain",
+          }}
+        />
+        <Text style={styles.buttonText}>Back to TASKS</Text>
       </Button>
     </SafeAreaView>
   );
@@ -340,7 +354,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontWeight: "bold",
-    fontSize: hp("3%"),
+    fontSize: hp("4%"),
   },
   backButton: {
     position: "absolute",

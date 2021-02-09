@@ -1,4 +1,3 @@
-import { Entypo } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
 import { LinearGradient } from "expo-linear-gradient";
 import { Button, Card, CardItem, Text } from "native-base";
@@ -33,16 +32,22 @@ export default function TaskScreen({ navigation }) {
         let keys = Object.keys(dbTasks);
         findNextTask(dbTasks, keys);
         const categorySet = new Set(keys.map((key) => dbTasks[key].category));
-        const fetchedTasks = ["morning", "motivators"].map((category) => {
-          const task1d = keys
-            .filter((key) => dbTasks[key].category === category)
-            .map((key) => {
-              return { id: key, ...dbTasks[key] };
-            });
-          var tasks2d = [];
-          while (task1d.length) tasks2d.push(task1d.splice(0, 2));
-          return { category: category, tasks: tasks2d };
-        });
+        const fetchedTasks = ["morning", "afternoon", "evening", "motivators"]
+          .map((category) => {
+            const task1d = keys
+              .filter(
+                (key) =>
+                  dbTasks[key].category === category &&
+                  dbTasks[key].disabled === false
+              )
+              .map((key) => {
+                return { id: key, ...dbTasks[key] };
+              });
+            var tasks2d = [];
+            while (task1d.length) tasks2d.push(task1d.splice(0, 2));
+            return { category: category, tasks: tasks2d };
+          })
+          .filter((elem) => elem.tasks.length > 0);
         setTasks(fetchedTasks);
       });
     // Stop listening for updates when no longer required
@@ -56,6 +61,7 @@ export default function TaskScreen({ navigation }) {
   const findNextTask = (tasks, keys) => {
     const sortedTasks = keys
       .map((key) => tasks[key])
+      .filter((task) => task.disabled === false)
       .sort((a, b) => {
         const aDate = new Date(a.time * 1000);
         const bDate = new Date(b.time * 1000);
@@ -169,9 +175,17 @@ export default function TaskScreen({ navigation }) {
         style={styles.backButton}
         onPress={() => navigation.navigate("Home")}
       >
-        <Text style={styles.backButtonText}>
-          <Entypo name="home" size={hp("4%")} color="white" /> Back to HOME
-        </Text>
+        <Image
+          source={require("../../assets/icons/home.png")}
+          fadeDuration={0}
+          style={{
+            width: wp("10%"),
+            aspectRatio: 1,
+            resizeMode: "contain",
+            marginBottom: 10,
+          }}
+        />
+        <Text style={styles.backButtonText}>Back to HOME</Text>
       </Button>
     </SafeAreaView>
   );
