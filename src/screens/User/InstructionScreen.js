@@ -24,6 +24,10 @@ export default function InstructionScreen({ navigation, route }) {
   let [volume, setVolume] = useState(1.0);
   let [isBuffering, setIsBuffering] = useState(true);
   let [isPlaying, setIsPlaying] = useState(true);
+  let [timeout, setTime] = useState();
+  let [timeLeft, setTimeLeft] = useState(
+    steps.length > 0 ? steps[currentIndex].duration : 0
+  );
 
   useFonts({
     Rubik: require("../../assets/fonts/Rubik-Regular.ttf"),
@@ -40,6 +44,7 @@ export default function InstructionScreen({ navigation, route }) {
       playThroughEarpieceAndroid: true,
     });
     loadAudio();
+    setTimeLeft(steps[currentIndex].duration);
   }, [currentIndex]);
 
   const loadAudio = async (newPlaybackInstance, source) => {
@@ -62,22 +67,33 @@ export default function InstructionScreen({ navigation, route }) {
     }
   };
 
+  useEffect(() => {
+    if (!timeLeft) setCurrentIndex(currentIndex + 1);
+    const intervalId = setInterval(() => {
+      setTimeLeft(timeLeft - (isPlaying ? 1 : 0));
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, [timeLeft, isPlaying]);
+
   const onPlaybackStatusUpdate = (status) => {
     setIsBuffering(isBuffering);
     if (status.didJustFinish) {
-      if (currentIndex <= steps.length - 2) {
-        setTimeout(() => {
-          setCurrentIndex(currentIndex + 1);
-        }, 3000);
-      }
+      // if (currentIndex <= steps.length - 2) {
+      //   setTimeout(() => {
+      //     setCurrentIndex(currentIndex + 1);
+      //   }, steps[currentIndex].duration * 1000);
+      // }
     }
   };
 
   const handlePlayPause = async () => {
-    isPlaying
-      ? await playbackInstance.pauseAsync()
-      : await playbackInstance.playAsync();
-
+    if (isPlaying) {
+      await playbackInstance.pauseAsync();
+      timeout ? timeout.pause() : null;
+    } else {
+      await playbackInstance.playAsync();
+      timeout ? timeout.start() : null;
+    }
     setIsPlaying(!isPlaying);
   };
 
@@ -106,30 +122,9 @@ export default function InstructionScreen({ navigation, route }) {
       setIsPlaying(!isPlaying);
       await playbackInstance.replayAsync();
     }
+    setTimeLeft(steps[currentIndex].duration);
     await playbackInstance.replayAsync();
   };
-
-  // play audio
-  // let soundObject = new Audio.Sound();
-  // let audioPromise = new Promise((resolve, reject) => {
-  //   soundObject.loadAsync(
-  //     { uri: steps[currentIndex].audio },
-  //     { shouldPlay: true }
-  //   );
-  //   soundObject.setOnPlaybackStatusUpdate((status) => {
-  //     if (status.didJustFinish) {
-  //       if (currentIndex <= steps.length - 2) {
-  //         setTimeout(() => {
-  //           setcurrentIndex(currentIndex + 1);
-  //         }, 3000);
-  //       }
-  //     }
-  //   });
-  // })
-  //   .then(() => {
-  //     soundObject.unloadAsync();
-  //   })
-  //   .catch(console.log);
 
   const renderFileInfo = steps ? (
     <Card style={styles.highlight}>
@@ -248,65 +243,20 @@ export default function InstructionScreen({ navigation, route }) {
               </TouchableOpacity>
             )}
           </View>
-          {/* <View style={{ flex: 1, flexDirection: "row" }}>
-            {currentIndex == 0 ? (
-              <>
-                <Card style={{ ...styles.circleCard, backgroundColor: "gray" }}>
-                  <Entypo name="arrow-bold-left" size={50} color="black" />
-                  <Text style={styles.stepText}>Previous step</Text>
-                </Card>
-              </>
-            ) : (
-              <TouchableOpacity
-                onPress={() => {
-                  // previous step button pressed
-                  if (currentIndex >= 1) {
-                    setcurrentIndex(currentIndex - 1);
-                    soundObject.stopAsync();
-                  }
-                }}
-              >
-                <Card style={styles.circleCard}>
-                  <Entypo name="arrow-bold-left" size={50} color="black" />
-                  <Text style={styles.stepText}>Previous step</Text>
-                </Card>
-              </TouchableOpacity>
-            )}
-
-            {currentIndex == steps.length - 1 ? (
-              <>
-                <TouchableOpacity
-                  onPress={() => {
-                    soundObject.stopAsync();
-                    navigation.navigate("CongratsScreen");
-                  }}
-                >
-                  <Card
-                    style={{ ...styles.circleCard, backgroundColor: "green" }}
-                  >
-                    <Entypo name="check" size={75} color="white" />
-                    <Text style={{ ...styles.stepText, color: "#fff" }}>
-                      Task done
-                    </Text>
-                  </Card>
-                </TouchableOpacity>
-              </>
-            ) : (
-              <TouchableOpacity
-                onPress={() => {
-                  if (currentIndex < steps.length - 1) {
-                    setcurrentIndex(currentIndex + 1);
-                    soundObject.stopAsync();
-                  }
-                }}
-              >
-                <Card style={styles.circleCard}>
-                  <Entypo name="arrow-bold-right" size={50} color="black" />
-                  <Text style={styles.stepText}>Next step</Text>
-                </Card>
-              </TouchableOpacity>
-            )}
-          </View> */}
+          <ProgressBar
+            marginTop={5}
+            marginLeft={14}
+            progress={
+              (steps[currentIndex].duration - timeLeft) /
+              steps[currentIndex].duration
+            }
+            width={wp("90%")}
+            color="#444"
+            backgroundColor={"#fff"}
+            borderWidth={0}
+            height={hp("1%")}
+          />
+          {/* <Text>{timeLeft}</Text> */}
         </>
       ) : (
         <></>
