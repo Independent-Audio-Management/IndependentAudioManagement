@@ -1,5 +1,11 @@
 import * as firebase from "firebase";
-// const { apiKey, authDomain, databaseURL, projectId, storageBucket } = getEnvVars();
+// const {
+//   apiKey,
+//   authDomain,
+//   databaseURL,
+//   projectId,
+//   storageBucket,
+// } = getEnvVars();
 // Initialize Firebase
 const firebaseConfig = {
   // apiKey: `${apiKey}`,
