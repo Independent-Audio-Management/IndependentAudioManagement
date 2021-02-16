@@ -4,6 +4,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "web": "expo start --web",
+    "prod": "expo start --no-dev --minify",
     "start": "expo start",
     "test": "jest"
   },
@@ -30,6 +31,7 @@
     "react-native-dotenv": "^2.5.0",
     "react-native-gesture-handler": "~1.7.0",
     "react-native-progress": "^4.1.2",
+    "react-native-progress-circle": "^2.1.0",
     "react-native-reanimated": "~1.13.0",
     "react-native-responsive-screen": "^1.4.2",
     "react-native-screens": "~2.10.1",

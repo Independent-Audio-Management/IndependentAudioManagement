@@ -1,27 +1,25 @@
+import { useFonts } from "expo-font";
+import { LinearGradient } from "expo-linear-gradient";
+import { Button, Card, CardItem, Text } from "native-base";
 import React, { useEffect, useState } from "react";
 import {
+  Image,
+  SafeAreaView,
+  ScrollView,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
   View,
-  Dimensions,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { useFonts } from "expo-font";
-import { Card, CardItem, Text, Button } from "native-base";
-import { Image } from "react-native";
-import { Entypo } from "@expo/vector-icons";
-import { db } from "../../utils/firebase";
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
+import { db } from "../../utils/firebase";
 
 export default function TaskScreen({ navigation }) {
   const [userId, settUserId] = useState("36112759-7710-4c22-b63b-8433b507f02e");
   const [tasks, setTasks] = useState([]);
-  const [highlight, setHighlight] = useState({});
+  const [highlight, setHighlight] = useState(null);
   const [loaded] = useFonts({
     Rubik: require("../../assets/fonts/Rubik-Regular.ttf"),
   });
@@ -32,26 +30,64 @@ export default function TaskScreen({ navigation }) {
       .on("value", (snapshot) => {
         let dbTasks = snapshot.val();
         let keys = Object.keys(dbTasks);
+        findNextTask(dbTasks, keys);
         const categorySet = new Set(keys.map((key) => dbTasks[key].category));
-        const fetchedTasks = [...categorySet].map((category) => {
-          const task1d = keys
-            .filter((key) => dbTasks[key].category === category)
-            .map((key) => {
-              return { id: key, ...dbTasks[key] };
-            });
-          setHighlight(task1d[getRandomInt(task1d.length)]);
-          var tasks2d = [];
-          while (task1d.length) tasks2d.push(task1d.splice(0, 2));
-          return { category: category, tasks: tasks2d };
-        });
+        const fetchedTasks = ["morning", "afternoon", "evening", "motivators"]
+          .map((category) => {
+            const task1d = keys
+              .filter(
+                (key) =>
+                  dbTasks[key].category === category &&
+                  dbTasks[key].disabled === false
+              )
+              .map((key) => {
+                return { id: key, ...dbTasks[key] };
+              });
+            var tasks2d = [];
+            while (task1d.length) tasks2d.push(task1d.splice(0, 2));
+            return { category: category, tasks: tasks2d };
+          })
+          .filter((elem) => elem.tasks.length > 0);
         setTasks(fetchedTasks);
       });
     // Stop listening for updates when no longer required
     return () => db.ref(`/users/${userId}`).off("value", onValueChange);
   }, [userId]);
 
-  const getRandomInt = (max) => {
-    return Math.floor(Math.random() * Math.floor(max));
+  // const getRandomInt = (max) => {
+  //   return Math.floor(Math.random() * Math.floor(max));
+  // };
+
+  const findNextTask = (tasks, keys) => {
+    const sortedTasks = keys
+      .map((key) => tasks[key])
+      .filter((task) => task.disabled === false)
+      .sort((a, b) => {
+        const aDate = new Date(a.time * 1000);
+        const bDate = new Date(b.time * 1000);
+        // compare hours first
+        if (aDate.getHours() < bDate.getHours()) return -1;
+        if (aDate.getHours() > bDate.getHours()) return 1;
+
+        // else a.hour === b.hour, so compare minutes to break the tie
+        if (aDate.getMinutes() < bDate.getMinutes()) return -1;
+        if (aDate.getMinutes() > bDate.getMinutes()) return 1;
+
+        // couldn't break the tie
+        return 0;
+      });
+    const nextTask = sortedTasks.find((e) => {
+      const currentTime = new Date();
+      const taskTime = new Date(e.time * 1000);
+      if (currentTime.getHours() < taskTime.getHours()) return true;
+      if (
+        currentTime.getHours() === taskTime.getHours() &&
+        currentTime.getMinutes() < taskTime.getMinutes()
+      )
+        return true;
+      return false;
+    });
+    if (!!nextTask) setHighlight(nextTask);
   };
 
   return (
@@ -67,27 +103,31 @@ export default function TaskScreen({ navigation }) {
           height: hp("100%"),
         }}
       />
-      <Text style={styles.subtitle}>Next</Text>
-      <TouchableOpacity
-        onPress={() =>
-          navigation.navigate("InstructionScreen", {
-            instructions: highlight.instructions,
-            title: highlight.name,
-          })
-        }
-      >
-        <Card style={styles.highlight}>
-          <CardItem cardBody>
-            <Image
-              source={{ uri: highlight.image }}
-              style={{ width: wp("40%"), aspectRatio: 1 }}
-            />
-          </CardItem>
-          <CardItem cardBody>
-            <Text style={styles.buttonText}>{highlight.name}</Text>
-          </CardItem>
-        </Card>
-      </TouchableOpacity>
+      <Text style={styles.subtitle}>
+        {!!highlight ? "Next" : "No Upcoming Tasks"}
+      </Text>
+      {!!highlight && (
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("InstructionScreen", {
+              instructions: highlight.instructions,
+              title: highlight.name,
+            })
+          }
+        >
+          <Card style={styles.highlight}>
+            <CardItem cardBody>
+              <Image
+                source={{ uri: highlight.image }}
+                style={{ width: wp("40%"), aspectRatio: 1 }}
+              />
+            </CardItem>
+            <CardItem cardBody>
+              <Text style={styles.buttonText}>{highlight.name}</Text>
+            </CardItem>
+          </Card>
+        </TouchableOpacity>
+      )}
       <ScrollView style={{ marginBottom: 100 }}>
         {tasks.map((elem, i) => {
           return (
@@ -135,9 +175,17 @@ export default function TaskScreen({ navigation }) {
         style={styles.backButton}
         onPress={() => navigation.navigate("Home")}
       >
-        <Text style={styles.backButtonText}>
-          <Entypo name="home" size={hp("4%")} color="white" /> Back to HOME
-        </Text>
+        <Image
+          source={require("../../assets/icons/home.png")}
+          fadeDuration={0}
+          style={{
+            width: wp("10%"),
+            aspectRatio: 1,
+            resizeMode: "contain",
+            marginBottom: 10,
+          }}
+        />
+        <Text style={styles.backButtonText}>Back to HOME</Text>
       </Button>
     </SafeAreaView>
   );
