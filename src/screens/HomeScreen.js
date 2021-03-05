@@ -2,7 +2,7 @@ import { useFonts } from "expo-font";
 import { LinearGradient } from "expo-linear-gradient";
 import { Card, CardItem, Container, Text } from "native-base";
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, TouchableOpacity } from "react-native";
+import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -42,6 +42,29 @@ export default function HomeScreen({ navigation }) {
           height: hp("100%"),
         }}
       />
+      <View
+        style={{
+          alignSelf: "flex-end",
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("AdminTask");
+          }}
+          style={{ marginRight: 30 }}
+        >
+          <Image
+            source={require("../assets/icons/setting.png")}
+            style={{
+              width: wp("20%"),
+              height: wp("10%"),
+              aspectRatio: 1,
+            }}
+            fadeDuration={0}
+          />
+        </TouchableOpacity>
+      </View>
+
       <Text style={styles.title}>Hello There!</Text>
       <TouchableOpacity onPress={() => navigation.navigate("QR")}>
         <Card style={styles.card1}>

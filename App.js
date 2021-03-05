@@ -1,11 +1,8 @@
 import React from "react";
-import { Provider } from "react-redux";
 import store from "./src/app/store";
-import AppStack from "./src/navigations/AppStack";
+// import AppStack from "./src/navigations/AppStack";
+import Providers from "./src/navigations";
+
 export default function App() {
-  return (
-    <Provider store={store}>
-      <AppStack />
-    </Provider>
-  );
+  return <Providers store={store} />;
 }
