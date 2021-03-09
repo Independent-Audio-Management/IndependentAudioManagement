@@ -1,5 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import * as React from "react";
+import AdminPincodeScreen from "../screens/Admin/AdminPincodeScreen";
 import AdminTaskScreen from "../screens/Admin/AdminTaskScreen";
 import HomeScreen from "../screens/HomeScreen";
 import CongratsScreen from "../screens/User/CongratsScreen";
@@ -18,6 +19,7 @@ const AppStack = () => {
       <Stack.Screen name="InstructionScreen" component={InstructionScreen} />
       <Stack.Screen name="CongratsScreen" component={CongratsScreen} />
       <Stack.Screen name="AdminTask" component={AdminTaskScreen} />
+      <Stack.Screen name="AdminPincode" component={AdminPincodeScreen} />
     </Stack.Navigator>
   );
 };

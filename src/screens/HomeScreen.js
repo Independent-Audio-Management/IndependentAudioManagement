@@ -49,7 +49,7 @@ export default function HomeScreen({ navigation }) {
       >
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("AdminTask");
+            navigation.navigate("AdminPincode");
           }}
           style={{ marginRight: 30 }}
         >
