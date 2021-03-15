@@ -289,8 +289,8 @@ export default function InstructionScreen({ navigation, route }) {
               steps[currentIndex].duration
             }
             width={wp("90%")}
-            color="#444"
-            backgroundColor={"#fff"}
+            color="#31ab24"
+            backgroundColor={"#db5e5e"}
             borderWidth={0}
             height={hp("1%")}
           />
@@ -298,6 +298,16 @@ export default function InstructionScreen({ navigation, route }) {
       ) : (
         <></>
       )}
+      <View style={styles.timeLeft}>
+        <Text style={styles.timeLeftText}>
+          {steps[currentIndex].duration - timeLeft + " seconds"}
+        </Text>
+        <Text style={styles.timeLeftText}>
+          {steps[currentIndex].duration +
+            (timeLeft - steps[currentIndex].duration) +
+            " seconds left"}
+        </Text>
+      </View>
 
       <Button
         style={styles.backButton}
@@ -326,6 +336,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    backgroundColor: "#fff",
     // justifyContent: "center",
   },
   highlight: {
@@ -421,5 +432,17 @@ const styles = StyleSheet.create({
   albumCover: {
     width: wp("75%"),
     height: hp("25%"),
+  },
+  timeLeft: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: wp("87%"),
+    marginTop: 5,
+    marginLeft: 15,
+  },
+  timeLeftText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#666666",
   },
 });
