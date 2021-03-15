@@ -18,7 +18,6 @@ import { AuthUserContext } from "../../navigations/AuthUserProvider";
 import { db, dbh } from "../../utils/firebase";
 
 export default function TaskScreen({ navigation }) {
-  // const [userId, settUserId] = useState("36112759-7710-4c22-b63b-8433b507f02e");
   const { user } = useContext(AuthUserContext);
   const [uid] = useState(user.uid);
   const [tasks, setTasks] = useState([]);
