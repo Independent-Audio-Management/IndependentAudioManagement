@@ -1,5 +1,7 @@
+// import firestore from "@react-native-firebase/firestore";
 import * as firebase from "firebase";
 import "firebase/auth";
+import "firebase/firestore";
 import firebaseConfig from "../config/firebaseConfig";
 
 // Initialize Firebase App
@@ -10,6 +12,7 @@ if (!firebase.apps.length) {
 export const auth = firebase.auth();
 export const db = firebase.database();
 export const storage = firebase.storage();
+export const dbh = firebase.firestore();
 
 export const loginWithEmail = (email, password) =>
   auth.signInWithEmailAndPassword(email, password);

@@ -1,25 +1,27 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { logout } from "../../utils/firebase";
+import { AuthUserContext } from "../../navigations/AuthUserProvider";
+import { dbh, logout } from "../../utils/firebase";
 
 export default function AdminPincodeScreen({ navigation }) {
-  const [correctPass] = useState(["1", "3", "2", "1"]);
+  const { user } = useContext(AuthUserContext);
+  const [correctPass, setCorrectPass] = useState(null);
   const [passcode, setPasscode] = useState(["", "", "", ""]);
-  const [keypad, setKeypad] = useState([
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "0",
-  ]);
+  const [keypad] = useState(["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]);
+
+  useEffect(() => {
+    dbh
+      .collection("Users")
+      .doc(`${user.uid}`)
+      .get()
+      .then((querySnapshot) => {
+        setCorrectPass(querySnapshot.data().pin);
+      });
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient
@@ -33,7 +35,7 @@ export default function AdminPincodeScreen({ navigation }) {
         }}
       />
       <View style={styles.swipe}>
-        <View style={{ marginTop: 75 }}>
+        <View style={{ marginTop: 10 }}>
           <View>
             <Text style={styles.passcodeText}>Enter Passcode</Text>
           </View>
@@ -58,7 +60,6 @@ export default function AdminPincodeScreen({ navigation }) {
                 key={"keypad" + keyNum}
                 onPress={() => {
                   const index = passcode.findIndex((elem) => elem === "");
-                  console.log(index);
                   let clone = [...passcode];
                   if (index !== -1) {
                     clone[index] = keyNum;
@@ -164,7 +165,6 @@ const styles = StyleSheet.create({
   numbersContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginTop: 58,
     width: 282,
     height: 348,
     alignItems: "center",
