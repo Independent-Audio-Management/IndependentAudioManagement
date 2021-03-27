@@ -1,5 +1,6 @@
 import { useFonts } from "expo-font";
 import { LinearGradient } from "expo-linear-gradient";
+import * as ImagePicker from "expo-image-picker";
 import {
   Card,
   CardItem,
@@ -30,19 +31,32 @@ import {
 } from "react-native-responsive-screen";
 import { db } from "../../utils/firebase";
 
-export default function AdminTaskEditScreen({ navigation }) {
+export default function AdminTaskEditScreen({ navigation, route }) {
   const [userId, settUserId] = useState("36112759-7710-4c22-b63b-8433b507f02e");
   const [loaded] = useFonts({
     Rubik: require("../../assets/fonts/Rubik-Medium.ttf"),
   });
   const [name, setName] = useState("");
-  const [taskName, setTaskName] = useState("");
-  const [category, setCategory] = useState("");
+  const [taskName, setTaskName] = useState(route.params.taskname);
+  const [category, setCategory] = useState(route.params.category);
   const [toggleCheckBox, setToggleCheckBox] = useState(true);
-  const [selectedTime, setSelectedTime] = useState("");
+  const [selectedTime, setSelectedTime] = useState(
+    new Date(route.params.time * 1000)
+  );
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
+  const [image, setImage] = useState(route.params.image);
 
   useEffect(() => {
+    (async () => {
+      if (Platform.OS !== "web") {
+        const {
+          status,
+        } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+          alert("Sorry, we need camera roll permissions to make this work!");
+        }
+      }
+    })();
     const onValueChange = db
       .ref(`/users/${userId}/name`)
       .on("value", (snapshot) => {
@@ -55,6 +69,21 @@ export default function AdminTaskEditScreen({ navigation }) {
   if (!loaded) {
     return null;
   }
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
+  };
 
   const showTimePicker = () => {
     setTimePickerVisibility(true);
@@ -74,7 +103,7 @@ export default function AdminTaskEditScreen({ navigation }) {
     <>
       <Container style={styles.container}>
         <LinearGradient
-          colors={["#F4A261", "transparent"]}
+          colors={["#e9aa73", "#e6ca84"]}
           style={{
             position: "absolute",
             left: 0,
@@ -85,10 +114,14 @@ export default function AdminTaskEditScreen({ navigation }) {
         />
         <Text style={styles.title}>Task Overview</Text>
         <Item style={styles.taskNameBox} floatingLabel>
-          <Label style={{ color: "lightgrey", fontFamily: "Rubik" }}>
+          <Label style={{ color: "#737568", fontFamily: "Rubik" }}>
             Task Name
           </Label>
-          <Input style={{ fontFamily: "Rubik" }} />
+          <Input
+            style={{ fontFamily: "Rubik" }}
+            onChangeText={(text) => setTaskName(text)}
+            value={taskName}
+          />
         </Item>
         <Item picker style={styles.taskCategory}>
           <View
@@ -99,17 +132,15 @@ export default function AdminTaskEditScreen({ navigation }) {
               justifyContent: "space-between",
             }}
           >
-            <Text style={{ color: "lightgrey", fontFamily: "Rubik" }}>
+            <Text style={{ color: "#737568", fontFamily: "Rubik" }}>
               Category
             </Text>
             <Picker
               mode="dropdown"
-              iosIcon={
-                <Icon name="arrow-down" style={{ color: "lightgrey" }} />
-              }
+              iosIcon={<Icon name="arrow-down" style={{ color: "#737568" }} />}
               style={{ width: undefined }}
               placeholder="Select category"
-              placeholderStyle={{ color: "lightgrey", fontFamily: "Rubik" }}
+              placeholderStyle={{ color: "#737568", fontFamily: "Rubik" }}
               textStyle={{ fontFamily: "Rubik" }}
               itemTextStyle={{ fontFamily: "Rubik" }}
               // placeholderStyle={{ color: "#bfc6ea" }}
@@ -120,14 +151,15 @@ export default function AdminTaskEditScreen({ navigation }) {
               <Picker.Item label="Morning" value="morning" />
               <Picker.Item label="Afternoon" value="afternoon" />
               <Picker.Item label="Evening" value="evening" />
-              <Picker.Item label="Motivator" value="motivator" />
+              <Picker.Item label="Motivator" value="motivators" />
             </Picker>
           </View>
         </Item>
         <View style={styles.checkbox}>
           <BouncyCheckbox
             isChecked={toggleCheckBox}
-            fillColor="#4f9b8f"
+            // fillColor="#4f9b8f"
+            fillColor="#2A9D8F"
             disableText
             onPress={(checked) => setToggleCheckBox(checked)}
           />
@@ -146,9 +178,18 @@ export default function AdminTaskEditScreen({ navigation }) {
             </Text>
             <NativeButton
               title="Set time"
-              color="lightgrey"
+              color="#737568"
               onPress={showTimePicker}
             />
+            {/* <TouchableOpacity
+              // fontWeight="400"
+              // fontFamily="Rubik"
+              // title="Set time"
+              // color="lightgrey"
+              onPress={showTimePicker}
+            >
+              <Text style={{ color: "lightgrey" }}>Set time</Text>
+            </TouchableOpacity> */}
             <DateTimePickerModal
               isVisible={isTimePickerVisible}
               headerTextIOS="Pick a time"
@@ -158,6 +199,19 @@ export default function AdminTaskEditScreen({ navigation }) {
             />
           </View>
         )}
+        <View style={{ alignItems: "center", justifyContent: "center" }}>
+          {image && (
+            <Image
+              source={{ uri: image }}
+              style={{ width: 200, height: 200 }}
+            />
+          )}
+          <NativeButton
+            title="+ Select Icon"
+            color="#2A9D8F"
+            onPress={pickImage}
+          />
+        </View>
         {/* <TouchableOpacity onPress={() => navigation.navigate("QR")}>
         <Card style={styles.card1}>
           <CardItem cardBody>
@@ -187,10 +241,16 @@ export default function AdminTaskEditScreen({ navigation }) {
       </Container>
       <Footer style={styles.footerTab}>
         <FooterTab>
-          <Button>
+          <Button onPress={() => navigation.navigate("AdminTask")}>
             <Icon style={styles.footerTabIcon} name="apps" />
           </Button>
-          <Button>
+          <Button
+            onPress={() =>
+              navigation.navigate("AdminInstructionEdit", {
+                taskname: taskName,
+              })
+            }
+          >
             <Icon style={styles.footerTabIcon} name="create" />
           </Button>
           <Button>
@@ -248,7 +308,8 @@ const styles = StyleSheet.create({
     fontFamily: "Rubik",
   },
   footerTab: {
-    backgroundColor: "#4f9b8f",
+    // backgroundColor: "#4f9b8f",
+    backgroundColor: "#2A9D8F",
   },
   footerTabIcon: {
     color: "white",
@@ -264,12 +325,14 @@ const styles = StyleSheet.create({
   checkbox: {
     marginTop: 15,
     marginLeft: 30,
+    marginBottom: 10,
     alignSelf: "flex-start",
     alignItems: "center",
     flexDirection: "row",
   },
   timeField: {
     marginLeft: 70,
+    marginBottom: 20,
     alignSelf: "flex-start",
     alignItems: "center",
     flexDirection: "row",
