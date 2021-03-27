@@ -17,6 +17,8 @@ target 'digitalInclusion' do
   use_flipper!
   pod 'react-native-spinkit', :path => '../node_modules/react-native-spinkit'
 
+  pod 'RNKeychain', :path => '../node_modules/react-native-keychain'
+
   post_install do |installer|
     flipper_post_install(installer)
   end

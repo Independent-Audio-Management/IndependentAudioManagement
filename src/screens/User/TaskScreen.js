@@ -1,7 +1,7 @@
 import { useFonts } from "expo-font";
 import { LinearGradient } from "expo-linear-gradient";
 import { Button, Card, CardItem, Text } from "native-base";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Image,
   SafeAreaView,
@@ -14,10 +14,12 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
-import { db } from "../../utils/firebase";
+import { AuthUserContext } from "../../navigations/AuthUserProvider";
+import { db, dbh } from "../../utils/firebase";
 
 export default function TaskScreen({ navigation }) {
-  const [userId, settUserId] = useState("36112759-7710-4c22-b63b-8433b507f02e");
+  const { user } = useContext(AuthUserContext);
+  const [uid] = useState(user.uid);
   const [tasks, setTasks] = useState([]);
   const [highlight, setHighlight] = useState(null);
   const [loaded] = useFonts({
@@ -25,34 +27,44 @@ export default function TaskScreen({ navigation }) {
   });
 
   useEffect(() => {
-    const onValueChange = db
-      .ref(`/users/${userId}/tasks`)
-      .on("value", (snapshot) => {
-        let dbTasks = snapshot.val();
-        let keys = Object.keys(dbTasks);
-        findNextTask(dbTasks, keys);
-        const categorySet = new Set(keys.map((key) => dbTasks[key].category));
-        const fetchedTasks = ["morning", "afternoon", "evening", "motivators"]
-          .map((category) => {
-            const task1d = keys
-              .filter(
-                (key) =>
-                  dbTasks[key].category === category &&
-                  dbTasks[key].disabled === false
-              )
-              .map((key) => {
-                return { id: key, ...dbTasks[key] };
-              });
-            var tasks2d = [];
-            while (task1d.length) tasks2d.push(task1d.splice(0, 2));
-            return { category: category, tasks: tasks2d };
-          })
-          .filter((elem) => elem.tasks.length > 0);
-        setTasks(fetchedTasks);
+    dbh
+      .collection("Users")
+      .doc(`${uid}`)
+      .get()
+      .then((querySnapshot) => {
+        const defaultPath = querySnapshot.data().defaultPath;
+        const onValueChange = db
+          .ref(`${defaultPath}`)
+          .on("value", (snapshot) => {
+            let dbTasks = snapshot.val();
+            let keys = Object.keys(dbTasks);
+            findNextTask(dbTasks, keys);
+            const categorySet = new Set(
+              keys.map((key) => dbTasks[key].category)
+            );
+            console.log([...categorySet]);
+            const fetchedTasks = [...categorySet]
+              .map((category) => {
+                const task1d = keys
+                  .filter(
+                    (key) =>
+                      dbTasks[key].category === category &&
+                      dbTasks[key].disabled === false
+                  )
+                  .map((key) => {
+                    return { id: key, ...dbTasks[key] };
+                  });
+                var tasks2d = [];
+                while (task1d.length) tasks2d.push(task1d.splice(0, 2));
+                return { category: category, tasks: tasks2d };
+              })
+              .filter((elem) => elem.tasks.length > 0);
+            setTasks(fetchedTasks);
+          });
+        // Stop listening for updates when no longer required
+        return () => db.ref(`${defaultPath}`).off("value", onValueChange);
       });
-    // Stop listening for updates when no longer required
-    return () => db.ref(`/users/${userId}`).off("value", onValueChange);
-  }, [userId]);
+  }, []);
 
   // const getRandomInt = (max) => {
   //   return Math.floor(Math.random() * Math.floor(max));
