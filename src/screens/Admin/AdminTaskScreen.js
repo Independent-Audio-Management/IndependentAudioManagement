@@ -80,11 +80,12 @@ export default function AdminTaskScreen({ navigation }) {
       <View
         style={{
           alignSelf: "flex-end",
+          zIndex: 1,
         }}
       >
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("AdminTask");
+            navigation.navigate("AdminTaskEdit");
           }}
           style={{ marginRight: 30, marginTop: 10 }}
         >

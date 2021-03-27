@@ -7,6 +7,7 @@ import CongratsScreen from "../screens/User/CongratsScreen";
 import InstructionScreen from "../screens/User/InstructionScreen";
 import QRScreen from "../screens/User/QRScreen";
 import TaskScreen from "../screens/User/TaskScreen";
+import AdminTaskEditScreen from "../screens/Admin/AdminTaskEditScreen";
 
 const Stack = createStackNavigator();
 
@@ -20,6 +21,7 @@ const AppStack = () => {
       <Stack.Screen name="CongratsScreen" component={CongratsScreen} />
       <Stack.Screen name="AdminTask" component={AdminTaskScreen} />
       <Stack.Screen name="AdminPincode" component={AdminPincodeScreen} />
+      <Stack.Screen name="AdminTaskEdit" component={AdminTaskEditScreen} />
     </Stack.Navigator>
   );
 };
