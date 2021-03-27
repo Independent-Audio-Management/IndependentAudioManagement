@@ -1,35 +1,29 @@
+import { Audio } from "expo-av";
 import { useFonts } from "expo-font";
-import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
+import { LinearGradient } from "expo-linear-gradient";
 import {
-  Card,
-  CardItem,
-  Container,
-  Text,
-  Footer,
-  FooterTab,
-  Icon,
-  Item,
-  Input,
-  Picker,
   Button,
+  Container,
+  Icon,
+  Input,
+  Item,
   Label,
+  Picker,
+  Text,
 } from "native-base";
-import BouncyCheckbox from "react-native-bouncy-checkbox";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 import React, { useEffect, useState } from "react";
 import {
+  Button as NativeButton,
   Image,
   StyleSheet,
   TouchableOpacity,
   View,
-  Button as NativeButton,
 } from "react-native";
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
-import { Audio } from "expo-av";
 import { db } from "../../utils/firebase";
 
 export default function AdminInstructionEditScreen({ navigation, route }) {
@@ -278,7 +272,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
           newSteps.push({ id: newId, step: step });
           setSteps(newSteps);
           console.log(newSteps);
-          // navigation.navigate("AdminTaskEdit");
+          navigation.navigate("AdminTaskEdit");
         }}
       >
         <Image

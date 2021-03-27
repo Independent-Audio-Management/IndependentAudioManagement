@@ -1,30 +1,22 @@
 import { useFonts } from "expo-font";
-import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
+import { LinearGradient } from "expo-linear-gradient";
 import {
-  Card,
-  CardItem,
+  Button,
   Container,
-  Text,
   Footer,
   FooterTab,
   Icon,
-  Item,
   Input,
-  Picker,
-  Button,
+  Item,
   Label,
+  Picker,
+  Text,
 } from "native-base";
+import React, { useEffect, useState } from "react";
+import { Button as NativeButton, Image, StyleSheet, View } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import React, { useEffect, useState } from "react";
-import {
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Button as NativeButton,
-} from "react-native";
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
