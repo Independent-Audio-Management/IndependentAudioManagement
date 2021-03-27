@@ -1,30 +1,32 @@
 import { useFonts } from "expo-font";
 import { LinearGradient } from "expo-linear-gradient";
 import { Card, CardItem, Container, Text } from "native-base";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
-import { db } from "../utils/firebase";
+import { AuthUserContext } from "../navigations/AuthUserProvider";
+import { dbh } from "../utils/firebase";
 
 export default function HomeScreen({ navigation }) {
-  const [userId, settUserId] = useState("36112759-7710-4c22-b63b-8433b507f02e");
+  const { user } = useContext(AuthUserContext);
+  const [uid] = useState(user.uid);
   const [loaded] = useFonts({
     Rubik: require("../assets/fonts/Rubik-Medium.ttf"),
   });
   const [name, setName] = useState("");
 
   useEffect(() => {
-    const onValueChange = db
-      .ref(`/users/${userId}/name`)
-      .on("value", (snapshot) => {
-        setName(snapshot.val());
+    dbh
+      .collection("Users")
+      .doc(`${uid}`)
+      .get()
+      .then((querySnapshot) => {
+        setName(querySnapshot.data().name);
       });
-    // Stop listening for updates when no longer required
-    return () => db.ref(`/users/${userId}`).off("value", onValueChange);
-  }, [userId]);
+  }, []);
 
   if (!loaded) {
     return null;
@@ -49,7 +51,7 @@ export default function HomeScreen({ navigation }) {
       >
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("AdminTask");
+            navigation.navigate("AdminPincode");
           }}
           style={{ marginRight: 30 }}
         >
@@ -65,7 +67,7 @@ export default function HomeScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.title}>Hello There!</Text>
+      <Text style={styles.title}>{`Hello ${name}`}</Text>
       <TouchableOpacity onPress={() => navigation.navigate("QR")}>
         <Card style={styles.card1}>
           <CardItem cardBody>
