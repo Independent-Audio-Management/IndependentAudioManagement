@@ -47,7 +47,7 @@ export default function InstructionScreen({ navigation, route }) {
     setTimeLeft(steps[currentIndex].duration);
   }, [currentIndex]);
 
-  const loadAudio = async (newPlaybackInstance, source) => {
+  const loadAudio = async () => {
     try {
       const newPlaybackInstance = new Audio.Sound();
       const source = {
@@ -78,7 +78,12 @@ export default function InstructionScreen({ navigation, route }) {
     return () => clearInterval(intervalId);
   }, [timeLeft, isPlaying]);
 
-  const onPlaybackStatusUpdate = (status) => {
+  const onPlaybackStatusUpdate = async (status) => {
+    try {
+      await playbackInstance.unloadAsync();
+    } catch (error) {
+      console.log(error);
+    }
     setIsBuffering(isBuffering);
     if (status.didJustFinish) {
       // if (currentIndex <= steps.length - 2) {
@@ -102,21 +107,25 @@ export default function InstructionScreen({ navigation, route }) {
 
   const handlePreviousTrack = async () => {
     if (playbackInstance) {
-      await playbackInstance.unloadAsync();
-      currentIndex < steps.length - 1
-        ? (currentIndex -= 1)
-        : (currentIndex = 0);
-      setCurrentIndex(currentIndex);
+      console.log("back");
+      await playbackInstance.pauseAsync().then(() => {
+        currentIndex < steps.length - 1
+          ? (currentIndex -= 1)
+          : (currentIndex = 0);
+        setCurrentIndex(currentIndex);
+      });
     }
   };
 
   const handleNextTrack = async () => {
     if (playbackInstance) {
-      await playbackInstance.unloadAsync();
-      currentIndex < steps.length - 1
-        ? (currentIndex += 1)
-        : (currentIndex = 0);
-      setCurrentIndex(currentIndex);
+      console.log("skip");
+      await playbackInstance.pauseAsync().then(() => {
+        currentIndex < steps.length - 1
+          ? (currentIndex += 1)
+          : (currentIndex = 0);
+        setCurrentIndex(currentIndex);
+      });
     }
   };
 
