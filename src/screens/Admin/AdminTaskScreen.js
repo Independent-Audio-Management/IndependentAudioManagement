@@ -85,7 +85,14 @@ export default function AdminTaskScreen({ navigation }) {
       >
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("AdminTaskEdit");
+//             var newCityRef = dbh.collection("cities").doc();
+            navigation.navigate("AdminTaskEdit", {
+              instructions: "",
+              taskname: "",
+              category: "",
+              time: "",
+              image: null,
+            });
           }}
           style={{ marginRight: 30, marginTop: 10 }}
         >
@@ -116,9 +123,13 @@ export default function AdminTaskScreen({ navigation }) {
                         <TouchableOpacity
                           key={"task" + i}
                           onPress={() =>
-                            navigation.navigate("InstructionScreen", {
+                            navigation.navigate("AdminTaskEdit", {
+                              id: task.id,
                               instructions: task.instructions,
-                              title: task.name,
+                              taskname: task.name,
+                              category: task.category,
+                              time: task.time,
+                              image: task.image,
                             })
                           }
                         >
