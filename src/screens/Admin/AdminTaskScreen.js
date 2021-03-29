@@ -1,7 +1,7 @@
 import { useFonts } from "expo-font";
 import { LinearGradient } from "expo-linear-gradient";
 import { Button, Card, CardItem, Text } from "native-base";
-import React, { useEffect, useState, useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Image,
   SafeAreaView,
@@ -16,21 +16,33 @@ import {
 } from "react-native-responsive-screen";
 import { AuthUserContext } from "../../navigations/AuthUserProvider";
 import { db, dbh } from "../../utils/firebase";
+
 export default function AdminTaskScreen({ navigation }) {
   const { user } = useContext(AuthUserContext);
   const [uid] = useState(user.uid);
   const [tasks, setTasks] = useState([]);
+  const [tasksp, setTasksp] = useState([]);
   const [highlight, setHighlight] = useState(null);
   const [loaded] = useFonts({
     Rubik: require("../../assets/fonts/Rubik-Regular.ttf"),
   });
 
   useEffect(() => {
+    //To grab default tasks
+    setDefaultTasks();
+    //Personal Tasks
+    setPersonalTasks();
+    // Stop listening for updates when no longer required
+    // return () => db.ref(`${defaultPath}`).off("value", onValueChange);
+  }, []);
+
+  const setDefaultTasks = () => {
     dbh
       .collection("Users")
       .doc(`${uid}`)
       .get()
       .then((querySnapshot) => {
+        //Default tasks
         const defaultPath = querySnapshot.data().defaultPath;
         const onValueChange = db
           .ref(`${defaultPath}`)
@@ -40,7 +52,6 @@ export default function AdminTaskScreen({ navigation }) {
             const categorySet = new Set(
               keys.map((key) => dbTasks[key].category)
             );
-            console.log([...categorySet]);
             const fetchedTasks = [...categorySet]
               .map((category) => {
                 const task1d = keys
@@ -59,10 +70,28 @@ export default function AdminTaskScreen({ navigation }) {
               .filter((elem) => elem.tasks.length > 0);
             setTasks(fetchedTasks);
           });
-        // Stop listening for updates when no longer required
-        return () => db.ref(`${defaultPath}`).off("value", onValueChange);
       });
-  }, []);
+  };
+
+  const setPersonalTasks = () => {
+    dbh
+      .collection("Users")
+      .doc(`${uid}`)
+      .get()
+      .then((querySnapshot) => {
+        const personalTaskId = querySnapshot.data().tasks;
+        personalTaskId.forEach((id) => {
+          dbh
+            .collection("Tasks")
+            .doc(`${id}`)
+            .get()
+            .then((querySnapshot) => {
+              const taskItem = querySnapshot.data();
+              setTasksp([...tasksp, taskItem]);
+            });
+        });
+      });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -85,7 +114,7 @@ export default function AdminTaskScreen({ navigation }) {
       >
         <TouchableOpacity
           onPress={() => {
-//             var newCityRef = dbh.collection("cities").doc();
+            //             var newCityRef = dbh.collection("cities").doc();
             navigation.navigate("AdminTaskEdit", {
               instructions: "",
               taskname: "",

@@ -238,7 +238,7 @@ export default function AdminTaskEditScreen({ navigation, route }) {
           </Button>
           <Button
             onPress={() =>
-              navigation.navigate("AdminInstructionEdit", {
+              navigation.navigate("AdminInstructionOrder", {
                 taskname: taskName,
               })
             }
