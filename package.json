@@ -34,7 +34,6 @@
     "react-native": "~0.63.3",
     "react-native-bouncy-checkbox": "^1.0.8",
     "react-native-dotenv": "^2.5.0",
-    "react-native-elements": "^3.3.0",
     "react-native-gesture-handler": "~1.7.0",
     "react-native-login-screen": "^2.1.2",
     "react-native-modal-datetime-picker": "^9.2.0",
@@ -45,6 +44,7 @@
     "react-native-screens": "~2.10.1",
     "react-native-spinkit": "^1.5.1",
     "react-native-unimodules": "~0.11.0",
+    "react-native-uuid": "^1.4.9",
     "react-native-web": "~0.13.12",
     "react-redux": "^7.1.3"
   },
