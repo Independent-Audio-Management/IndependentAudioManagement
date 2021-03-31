@@ -7,6 +7,7 @@ I am is an Independent audio management application which lets users listen to i
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 ## Table of Contents
+- [How to run the app](#How-To-Run-The-App)
 - [Architecture](#Architecture)
 - [Prerequisites](#Prerequisites)
   - [NPM Installation](#NPM-Installation)
@@ -18,6 +19,25 @@ These instructions will get you a copy of the project up and running on your loc
 - [Contributing](#Contributing)
   - [Commit Etiquette](#Commit-Etiquette)
   - [Pull Request Checklist & Etiquette](#Pull-Request-Checklist-and-Etiquette)
+
+### How To Run The App
+There are two ways to run the app on your phone;
+
+##### Developmment Mode
+
+Development mode testing uses Expo to temporarily build and host the code. It generates a QR code for your phone to scan to be able to test it on your device. In order to test in development mode, the user has to follow these steps in order in order to properly run the code;
+1. Clone the github repo
+2. Implement [Prerequisites](#Prerequisites)
+3. Implement [Installation](#Installation)
+
+Currently, all of our developers have followed this method to test the app in development mode.
+
+##### User Testing Mode
+User testing mode uses Apple's beta testing software, *TestFlight* to allow iOS users to install the app on their devices without thee need to host the code themselves. *TestFlight* contains the production version of the software.
+
+In order to install the app using this method, install *TestFlight* from the App store. This method is by request only, therefore, please email macactivelives2020@gmail.com to receive an installation invite. 
+
+Currently, all of our test users have access to the production version of this app through *TestFlight*.
 
 ### Architecture
 Architecture and folder descriptions in progress
