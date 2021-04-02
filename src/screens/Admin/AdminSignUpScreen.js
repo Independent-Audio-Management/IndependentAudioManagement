@@ -9,7 +9,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { Button } from "react-native-elements";
+import { Button } from "react-native";
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
