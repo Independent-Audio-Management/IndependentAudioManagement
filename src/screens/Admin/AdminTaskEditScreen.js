@@ -240,6 +240,7 @@ export default function AdminTaskEditScreen({ navigation, route }) {
             onPress={() =>
               navigation.navigate("AdminInstructionOrder", {
                 taskname: taskName,
+                instructions: route.params.instructions,
               })
             }
           >

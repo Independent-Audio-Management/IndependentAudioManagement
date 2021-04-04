@@ -116,11 +116,12 @@ export default function AdminTaskScreen({ navigation }) {
           onPress={() => {
             //             var newCityRef = dbh.collection("cities").doc();
             navigation.navigate("AdminTaskEdit", {
-              instructions: "",
+              instructions: [],
               taskname: "",
               category: "",
               time: "",
               image: null,
+              audio: null,
             });
           }}
           style={{ marginRight: 30, marginTop: 10 }}

@@ -33,7 +33,9 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
   });
   const [name, setName] = useState();
   const [taskName, setTaskName] = useState(route.params.taskname);
-  const [instructionName, setInstructionName] = useState("");
+  const [instructionName, setInstructionName] = useState(
+    route.params.instruction
+  );
   const [steps, setSteps] = useState([
     { id: 1, step: 1 },
     { id: 2, step: 2 },
@@ -50,8 +52,8 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
   //     new Date(route.params.time * 1000)
   //   );
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
-  const [image, setImage] = useState(null);
-  const [recording, setRecording] = useState();
+  const [image, setImage] = useState(route.params.image);
+  const [recording, setRecording] = useState(route.params.audio);
   const [sound, setSound] = useState();
   const [recordingURI, setRecordingURI] = useState("./assets/Hello.mp3");
 
@@ -174,7 +176,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
         </View>
         <Item style={styles.taskNameBox} floatingLabel>
           <Label style={{ color: "#737568", fontFamily: "Rubik" }}>
-            Instruction Name
+            Instruction
           </Label>
           <Input
             style={{ fontFamily: "Rubik" }}
@@ -272,7 +274,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
           newSteps.push({ id: newId, step: step });
           setSteps(newSteps);
           console.log(newSteps);
-          navigation.navigate("AdminTaskEdit");
+          navigation.navigate("AdminInstructionOrder");
         }}
       >
         <Image

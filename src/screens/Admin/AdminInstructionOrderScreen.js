@@ -11,6 +11,8 @@ import {
   Label,
   Picker,
   Text,
+  Card,
+  CardItem,
 } from "native-base";
 import React, { useEffect, useState } from "react";
 import {
@@ -19,6 +21,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  SafeAreaView,
+  ScrollView,
 } from "react-native";
 import {
   heightPercentageToDP as hp,
@@ -27,123 +31,12 @@ import {
 import { db } from "../../utils/firebase";
 
 export default function AdminInstructionOrderScreen({ navigation, route }) {
-  const [userId, settUserId] = useState("36112759-7710-4c22-b63b-8433b507f02e");
-  const [loaded] = useFonts({
-    Rubik: require("../../assets/fonts/Rubik-Medium.ttf"),
-  });
-  const [name, setName] = useState();
-  const [taskName, setTaskName] = useState(route.params.taskname);
-  const [instructionName, setInstructionName] = useState("");
-  const [steps, setSteps] = useState([
-    { id: 1, step: 1 },
-    { id: 2, step: 2 },
-    { id: 3, step: 3 },
-    { id: 4, step: 4 },
-    { id: 5, step: 5 },
-    { id: 6, step: 6 },
-  ]);
-  const [step, setStep] = useState(
-    Math.max(...steps.map((stepObj) => stepObj.step), 0) + 1
+  const [taskname] = useState(route.params.taskname);
+  const [instructions, setInstructions] = useState(
+    route.params.instructions.map((e) => {
+      return { ...e, mute: false };
+    })
   );
-  const [toggleCheckBox, setToggleCheckBox] = useState(true);
-  //   const [selectedTime, setSelectedTime] = useState(
-  //     new Date(route.params.time * 1000)
-  //   );
-  const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
-  const [image, setImage] = useState(null);
-  const [recording, setRecording] = useState();
-  const [sound, setSound] = useState();
-  const [recordingURI, setRecordingURI] = useState("./assets/Hello.mp3");
-
-  useEffect(() => {
-    (async () => {
-      if (Platform.OS !== "web") {
-        const {
-          status,
-        } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== "granted") {
-          alert("Sorry, we need camera roll permissions to make this work!");
-        }
-      }
-    })();
-    const onValueChange = db
-      .ref(`/users/${userId}/name`)
-      .on("value", (snapshot) => {
-        setName(snapshot.val());
-      });
-    // Stop listening for updates when no longer required
-    sound
-      ? () => {
-          console.log("Unloading Sound");
-          sound.unloadAsync();
-        }
-      : undefined;
-    return () => db.ref(`/users/${userId}`).off("value", onValueChange);
-  }, [userId, sound]);
-
-  async function startRecording() {
-    try {
-      console.log("Requesting permissions..");
-      await Audio.requestPermissionsAsync();
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-      console.log("Starting recording..");
-      const recording = new Audio.Recording();
-      await recording.prepareToRecordAsync(
-        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-      );
-      await recording.startAsync();
-      setRecording(recording);
-      console.log("Recording started");
-    } catch (err) {
-      console.error("Failed to start recording", err);
-    }
-  }
-
-  async function stopRecording() {
-    console.log("Stopping recording..");
-    setRecording(undefined);
-    await recording.stopAndUnloadAsync();
-    const uri = recording.getURI();
-    setRecordingURI(uri);
-    console.log("Recording stopped and stored at", uri);
-  }
-
-  async function playSound() {
-    await Audio.setAudioModeAsync({
-      allowsRecordingIOS: false,
-      playsInSilentModeIOS: true,
-    });
-    console.log("Loading Sound");
-    const { sound } = await Audio.Sound.createAsync({
-      uri: recordingURI,
-    });
-    setSound(sound);
-
-    console.log("Playing Sound");
-    await sound.playAsync();
-  }
-
-  if (!loaded) {
-    return null;
-  }
-
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    console.log(result);
-
-    if (!result.cancelled) {
-      setImage(result.uri);
-    }
-  };
 
   return (
     <>
@@ -158,120 +51,89 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
             height: hp("100%"),
           }}
         />
-        <Text style={styles.title}>{taskName}</Text>
-        <View style={{ alignItems: "center", justifyContent: "center" }}>
-          {image && (
-            <Image
-              source={{ uri: image }}
-              style={{ width: 120, height: 120 }}
-            />
-          )}
-          <NativeButton
-            title="+ Select Image"
-            color="#2A9D8F"
-            onPress={pickImage}
-          />
-        </View>
-        <Item style={styles.taskNameBox} floatingLabel>
-          <Label style={{ color: "#737568", fontFamily: "Rubik" }}>
-            Instruction Name
-          </Label>
-          <Input
-            style={{ fontFamily: "Rubik" }}
-            onChangeText={(text) => setInstructionName(text)}
-            value={instructionName}
-          />
-        </Item>
-        {/* <View>
-          <NativeButton
-            title={recording ? "Stop Recording" : "Start Recording"}
-            onPress={recording ? stopRecording : startRecording}
-          />
-        </View> */}
-        {/* <View>
-          <NativeButton title="Play Sound" onPress={playSound} />
-        </View> */}
-        <View style={styles.controls}>
-          {recording ? (
-            <TouchableOpacity style={styles.playpause} onPress={stopRecording}>
-              <Image
-                source={require("../../assets/icons/record_stop.png")}
-                style={styles.record}
-                fadeDuration={0}
-              />
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity style={styles.playpause} onPress={startRecording}>
-              <Image
-                source={require("../../assets/icons/record.png")}
-                style={styles.record}
-                fadeDuration={0}
-              />
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity
-            style={styles.playpause}
-            disabled={recording}
-            onPress={playSound}
-          >
-            <Image
-              source={require("../../assets/icons/record_play.png")}
-              style={styles.play}
-              fadeDuration={0}
-            />
-          </TouchableOpacity>
-        </View>
-        <Item picker style={styles.taskCategory}>
+        <SafeAreaView>
           <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <Text style={{ color: "#737568", fontFamily: "Rubik" }}>
-              Category
-            </Text>
-            <Picker
-              mode="dropdown"
-              iosIcon={<Icon name="arrow-down" style={{ color: "#737568" }} />}
-              style={{ width: undefined }}
-              placeholder="Select category"
-              placeholderStyle={{ color: "#737568", fontFamily: "Rubik" }}
-              textStyle={{ fontFamily: "Rubik" }}
-              itemTextStyle={{ fontFamily: "Rubik" }}
-              // placeholderStyle={{ color: "#bfc6ea" }}
-              //   placeholderIconColor="#007aff"
-              selectedValue={step}
-              onValueChange={(value) => setStep(value)}
+            <Text style={styles.title}>{taskname}</Text>
+            <TouchableOpacity
+              onPress={() => {
+                //             var newCityRef = dbh.collection("cities").doc();
+                navigation.navigate("AdminInstructionEdit", {
+                  taskname: taskname,
+                  instruction: "",
+                  image: null,
+                  audio: null,
+                });
+              }}
+              style={{ marginTop: 20 }}
             >
-              {Array.from({ length: step }, (x, i) => (
-                <Picker.Item label={"Step " + (i + 1)} value={i + 1} />
-              ))}
-              {/* <Picker.Item label="Morning" value="morning" />
-              <Picker.Item label="Afternoon" value="afternoon" />
-              <Picker.Item label="Evening" value="evening" />
-              <Picker.Item label="Motivator" value="motivators" /> */}
-            </Picker>
+              <Image
+                source={require("../../assets/icons/add.png")}
+                style={{
+                  width: wp("20%"),
+                  height: wp("10%"),
+                  aspectRatio: 1,
+                }}
+                fadeDuration={0}
+              />
+            </TouchableOpacity>
           </View>
-        </Item>
+          <ScrollView style={{ marginBottom: 100 }}>
+            {instructions.map((step, i) => {
+              return (
+                <View style={{ flexDirection: "row" }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      let newMute = { ...step, mute: !step.mute };
+                      let newInstructions = [...instructions];
+                      newInstructions[i] = newMute;
+                      setInstructions(newInstructions);
+                    }}
+                    style={{ marginTop: 20 }}
+                  >
+                    <Image
+                      source={
+                        step.mute
+                          ? require("../../assets/icons/mute.png")
+                          : require("../../assets/icons/unmute.png")
+                      }
+                      style={{
+                        width: wp("20%"),
+                        height: wp("10%"),
+                        aspectRatio: 1,
+                      }}
+                      fadeDuration={0}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate("AdminInstructionEdit", {
+                        taskname: taskname,
+                        instruction: step.text,
+                        image: step.image,
+                        audio: step.audio,
+                      })
+                    }
+                  >
+                    <Card style={styles.card}>
+                      <CardItem cardBody>
+                        <Text>{step.text}</Text>
+                      </CardItem>
+                      {/* <CardItem cardBody>
+                  <Text style={styles.buttonText}>Scan</Text>
+                </CardItem> */}
+                    </Card>
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+          </ScrollView>
+        </SafeAreaView>
       </Container>
-
       <Button
         style={styles.backButton}
         onPress={() => {
-          let newSteps = [...steps];
-          newSteps.filter((obj) => {
-            if (obj.step >= step) {
-              obj.step = obj.step + 1;
-            }
-          });
-          const newId =
-            Math.max(...newSteps.map((stepObj) => stepObj.id), 0) + 1;
-          newSteps.push({ id: newId, step: step });
-          setSteps(newSteps);
-          console.log(newSteps);
           navigation.navigate("AdminTaskEdit");
         }}
       >
@@ -284,7 +146,7 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
             resizeMode: "contain",
           }}
         />
-        <Text style={styles.buttonText}>Back to Steps</Text>
+        <Text style={styles.buttonText}>Back to Task</Text>
       </Button>
     </>
   );
@@ -313,7 +175,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#E76F51",
     alignItems: "center",
-    justifyContent: "center",
+    // justifyContent: "center",
     textAlign: "center",
   },
   card1: {
@@ -348,6 +210,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginBottom: 30,
     fontFamily: "Rubik",
+    marginTop: 20,
   },
   buttonText: {
     fontSize: hp("4%"),
@@ -391,5 +254,18 @@ const styles = StyleSheet.create({
   play: {
     width: wp("25%"),
     height: wp("25%"),
+  },
+  card: {
+    height: hp("8%"),
+    width: wp("80%"),
+    paddingLeft: 15,
+    justifyContent: "center",
+
+    // alignItems: "center",
+    borderRadius: 20,
+    // shadowColor: "black",
+    // shadowOpacity: 0.5,
+    // shadowRadius: 5,
+    // shadowOffset: { width: -5, height: 5 },
   },
 });
