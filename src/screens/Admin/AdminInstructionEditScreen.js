@@ -2,6 +2,7 @@ import { Audio } from "expo-av";
 import { useFonts } from "expo-font";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
+import uuid from "uuid";
 import {
   Button,
   Container,
@@ -11,6 +12,7 @@ import {
   Label,
   Picker,
   Text,
+  Toast,
 } from "native-base";
 import React, { useEffect, useState } from "react";
 import {
@@ -24,7 +26,7 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
-import { db } from "../../utils/firebase";
+import { db, dbh, storage } from "../../utils/firebase";
 
 export default function AdminInstructionEditScreen({ navigation, route }) {
   const [userId, settUserId] = useState("36112759-7710-4c22-b63b-8433b507f02e");
@@ -32,6 +34,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
     Rubik: require("../../assets/fonts/Rubik-Medium.ttf"),
   });
   const [name, setName] = useState();
+  const [taskId, setTaskId] = useState(route.params.taskId);
   const [taskName, setTaskName] = useState(route.params.taskname);
   const [instructionName, setInstructionName] = useState(
     route.params.instruction
@@ -44,9 +47,12 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
     { id: 5, step: 5 },
     { id: 6, step: 6 },
   ]);
-  const [step, setStep] = useState(
-    Math.max(...steps.map((stepObj) => stepObj.step), 0) + 1
-  );
+  // const [step, setStep] = useState(
+  //   Math.max(...steps.map((stepObj) => stepObj.step), 0) + 1
+  // );
+  const [step, setStep] = useState(1);
+  const [stepId, setStepId] = useState(uuid.v4());
+  const [instructionDuration, setInstructionDuration] = useState("");
   const [toggleCheckBox, setToggleCheckBox] = useState(true);
   //   const [selectedTime, setSelectedTime] = useState(
   //     new Date(route.params.time * 1000)
@@ -55,7 +61,8 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
   const [image, setImage] = useState(route.params.image);
   const [recording, setRecording] = useState(route.params.audio);
   const [sound, setSound] = useState();
-  const [recordingURI, setRecordingURI] = useState("./assets/Hello.mp3");
+  const [recordingURI, setRecordingURI] = useState(null);
+  const [savingState, setSavingState] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -147,6 +154,104 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
     }
   };
 
+  const uploadImage = async (uri) => {
+    const uriParts = uri.split("/");
+    const fileName = uriParts[uriParts.length - 1];
+    console.log(uriParts);
+    console.log(fileName);
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    var ref = storage.ref().child(taskId + "/" + fileName);
+    return ref.put(blob).then(() => {
+      return ref.getDownloadURL().then((url) => {
+        return url;
+      });
+    });
+  };
+
+  const uploadRecording = async (uri) => {
+    const uriParts = uri.split("/");
+    const fileName = uriParts[uriParts.length - 1];
+    console.log(uriParts);
+    console.log(fileName);
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    var ref = storage.ref().child(taskId + "/Audio/" + fileName);
+    return ref.put(blob).then(() => {
+      return ref.getDownloadURL().then((url) => {
+        return url;
+      });
+    });
+  };
+
+  const addStep = (imageURI, recordingURI) => {
+    if (imageURI !== null && recordingURI !== null) {
+      setSavingState(true);
+      var instruction = {
+        text: instructionName,
+        step: step,
+        id: stepId,
+        duration: instructionDuration,
+      };
+
+      uploadImage(imageURI).then((url) => {
+        console.log(url);
+        instruction["image"] = url;
+        uploadRecording(recordingURI).then((url2) => {
+          console.log(url2);
+          instruction["audio"] = url2;
+          console.log(instruction);
+          var docRef = dbh.collection("Tasks").doc(taskId);
+          dbh
+            .runTransaction((transaction) => {
+              return transaction.get(docRef).then((doc) => {
+                if (!doc.data().instructions) {
+                  transaction.update(docRef, {
+                    instructions: [instruction],
+                  });
+                } else {
+                  const newInstructions = doc.data().instructions;
+                  const existingIndex = newInstructions.findIndex(
+                    (inst) => inst.id === stepId
+                  );
+                  if (existingIndex === -1) {
+                    newInstructions.push(instruction);
+                  } else {
+                    newInstructions[existingIndex] = instruction;
+                  }
+                  transaction.update(docRef, {
+                    instructions: newInstructions,
+                  });
+                }
+              });
+            })
+            .then(() => {
+              Toast.show({
+                text: "Saved Successfully!",
+                // buttonText: "Okay",
+                type: "warning",
+                duration: 4000,
+              });
+              console.log("Instruction successfully added/updated!");
+              setSavingState(false);
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        });
+      });
+    } else {
+      Toast.show({
+        text: "Please complete instruction!",
+        // buttonText: "Okay",
+        type: "danger",
+        duration: 4000,
+      });
+    }
+
+    // dbh.collection("Tasks").doc(taskId).update({instructions: [{}]});
+  };
+
   return (
     <>
       <Container style={styles.container}>
@@ -160,8 +265,37 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
             height: hp("100%"),
           }}
         />
+        <View
+          style={{
+            // alignSelf: "flex-end",
+            position: "absolute",
+            top: 0,
+            right: 0,
+            zIndex: 1,
+          }}
+        >
+          <Button
+            iconLeft
+            rounded
+            style={{
+              marginRight: 30,
+              marginTop: 60,
+              backgroundColor: "#2A9D8F",
+            }}
+            onPress={() => addStep(image, recordingURI)}
+          >
+            <Icon name="cog" />
+            <Text>Save</Text>
+          </Button>
+        </View>
         <Text style={styles.title}>{taskName}</Text>
-        <View style={{ alignItems: "center", justifyContent: "center" }}>
+        <View
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: 10,
+          }}
+        >
           {image && (
             <Image
               source={{ uri: image }}
@@ -223,7 +357,21 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
             />
           </TouchableOpacity>
         </View>
-        <Item picker style={styles.taskCategory}>
+        <Item style={styles.taskCategory} floatingLabel>
+          <Label style={{ color: "#737568", fontFamily: "Rubik" }}>
+            Instruction Duration
+          </Label>
+          <Input
+            style={{ fontFamily: "Rubik" }}
+            returnKeyType={Platform.OS === "ios" ? "done" : "next"}
+            keyboardType="numeric"
+            onChangeText={(text) =>
+              setInstructionDuration(text.replace(/[^0-9]/g, ""))
+            }
+            value={instructionDuration}
+          />
+        </Item>
+        {/* <Item picker style={styles.taskCategory}>
           <View
             style={{
               flex: 1,
@@ -251,30 +399,32 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
               {Array.from({ length: step }, (x, i) => (
                 <Picker.Item label={"Step " + (i + 1)} value={i + 1} />
               ))}
-              {/* <Picker.Item label="Morning" value="morning" />
-              <Picker.Item label="Afternoon" value="afternoon" />
-              <Picker.Item label="Evening" value="evening" />
-              <Picker.Item label="Motivator" value="motivators" /> */}
             </Picker>
           </View>
-        </Item>
+        </Item> */}
       </Container>
 
       <Button
+        disabled={savingState}
         style={styles.backButton}
         onPress={() => {
-          let newSteps = [...steps];
-          newSteps.filter((obj) => {
-            if (obj.step >= step) {
-              obj.step = obj.step + 1;
-            }
-          });
-          const newId =
-            Math.max(...newSteps.map((stepObj) => stepObj.id), 0) + 1;
-          newSteps.push({ id: newId, step: step });
-          setSteps(newSteps);
-          console.log(newSteps);
-          navigation.navigate("AdminInstructionOrder");
+          // let newSteps = [...steps];
+          // newSteps.filter((obj) => {
+          //   if (obj.step >= step) {
+          //     obj.step = obj.step + 1;
+          //   }
+          // });
+          // const newId =
+          //   Math.max(...newSteps.map((stepObj) => stepObj.id), 0) + 1;
+          // newSteps.push({ id: newId, step: step });
+          // setSteps(newSteps);
+          // console.log(newSteps);
+          // uploadImage(image);
+          // addStep(image, recordingURI);
+          // uploadRecording(recordingURI);
+          // console.log(imageFireURL);
+          // uploadRecording();
+          navigation.navigate("AdminTaskEdit");
         }}
       >
         <Image
@@ -365,10 +515,10 @@ const styles = StyleSheet.create({
   },
   taskNameBox: {
     width: wp("80%"),
-    marginBottom: 25,
+    marginBottom: 35,
   },
   taskCategory: {
-    marginTop: 20,
+    marginTop: 30,
     width: wp("80%"),
   },
   checkbox: {

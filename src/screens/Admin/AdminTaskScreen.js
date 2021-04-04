@@ -1,5 +1,6 @@
 import { useFonts } from "expo-font";
 import { LinearGradient } from "expo-linear-gradient";
+import { storage } from "firebase";
 import { Button, Card, CardItem, Text } from "native-base";
 import React, { useContext, useEffect, useState } from "react";
 import {
@@ -114,8 +115,19 @@ export default function AdminTaskScreen({ navigation }) {
       >
         <TouchableOpacity
           onPress={() => {
-            //             var newCityRef = dbh.collection("cities").doc();
+            var newDocRef = dbh.collection("Tasks").doc();
+            newDocRef.set({});
+            console.log(newDocRef.id);
+            // dbh
+            //   .collection("Tasks")
+            //   .add({})
+            //   .then((docRef) => {
+            //     console.log("Document written with ID: ", docRef.id);
+            //   });
+
+            // console.log(newDocRef.id);
             navigation.navigate("AdminTaskEdit", {
+              id: newDocRef.id,
               instructions: [],
               taskname: "",
               category: "",
