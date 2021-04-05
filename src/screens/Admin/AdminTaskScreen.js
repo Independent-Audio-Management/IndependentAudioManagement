@@ -16,16 +16,12 @@ import {
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
 import { AuthUserContext } from "../../navigations/AuthUserProvider";
-import { db, dbh } from "../../utils/firebase";
-import uuid from "uuid";
+import { dbh } from "../../utils/firebase";
 
 export default function AdminTaskScreen({ navigation }) {
   const { user } = useContext(AuthUserContext);
   const [uid] = useState(user.uid);
   const [tasks, setTasks] = useState([]);
-  const [tasksp, setTasksp] = useState([]);
-  // const [dbTasksw, setDbTasks] = useState(null);
-  const [highlight, setHighlight] = useState(null);
   const [loaded] = useFonts({
     Rubik: require("../../assets/fonts/Rubik-Regular.ttf"),
   });

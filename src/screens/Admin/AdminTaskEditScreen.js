@@ -14,7 +14,7 @@ import {
   Text,
   Toast,
 } from "native-base";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Button as NativeButton, Image, StyleSheet, View } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -22,14 +22,16 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
-import { db, storage, dbh } from "../../utils/firebase";
+import { storage, dbh } from "../../utils/firebase";
+import { AuthUserContext } from "../../navigations/AuthUserProvider";
+// import * as admin from "firebase-admin";
 
 export default function AdminTaskEditScreen({ navigation, route }) {
-  const [userId, settUserId] = useState("36112759-7710-4c22-b63b-8433b507f02e");
+  const { user } = useContext(AuthUserContext);
+  const [uid] = useState(user.uid);
   const [loaded] = useFonts({
     Rubik: require("../../assets/fonts/Rubik-Medium.ttf"),
   });
-  const [name, setName] = useState("");
   const [taskId, setTaskId] = useState(route.params.id);
   // console.log(id);
   const [taskName, setTaskName] = useState(route.params.taskname);
@@ -56,14 +58,7 @@ export default function AdminTaskEditScreen({ navigation, route }) {
         }
       }
     })();
-    const onValueChange = db
-      .ref(`/users/${userId}/name`)
-      .on("value", (snapshot) => {
-        setName(snapshot.val());
-      });
-    // Stop listening for updates when no longer required
-    return () => db.ref(`/users/${userId}`).off("value", onValueChange);
-  }, [userId]);
+  }, []);
 
   if (!loaded) {
     return null;
@@ -133,11 +128,19 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               time: time,
               image: url,
             })
+            // .then(() => {
+            //   dbh
+            //     .collection("Users")
+            //     .doc(uid)
+            //     .update({
+            //       // tasks: admin.firestore.FieldValue.arrayUnion(taskId),
+            //     });
+            // })
             .then(() => {
               Toast.show({
                 text: "Saved Successfully!",
                 // buttonText: "Okay",
-                type: "warning",
+                type: "success",
                 duration: 4000,
               });
               setSavedState(true);
@@ -155,17 +158,25 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               time: "",
               image: url,
             })
+            // .then(() => {
+            //   dbh
+            //     .collection("Users")
+            //     .doc(uid)
+            //     .update({
+            //       tasks: admin.firestore.FieldValue.arrayUnion(taskId),
+            //     });
+            // })
             .then(() => {
               Toast.show({
                 text: "Saved Successfully!",
                 // buttonText: "Okay",
-                type: "warning",
+                type: "success",
                 duration: 4000,
               });
-              setImage(url);
-              setSavedState(true);
-              console.log("Task added/updated successfully!");
             });
+          setImage(url);
+          setSavedState(true);
+          console.log("Task added/updated successfully!");
         }
       });
     } else {
@@ -375,6 +386,7 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               navigation.navigate("AdminInstructionOrder", {
                 taskname: taskName,
                 instructions: route.params.instructions,
+                taskId: taskId,
               })
             }
           >

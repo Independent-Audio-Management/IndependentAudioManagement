@@ -15,6 +15,7 @@ import {
   CardItem,
   Footer,
   FooterTab,
+  Toast,
 } from "native-base";
 import React, { useEffect, useState } from "react";
 import {
@@ -30,17 +31,17 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
-import { db } from "../../utils/firebase";
+import { dbh } from "../../utils/firebase";
 
 export default function AdminInstructionOrderScreen({ navigation, route }) {
   const [taskname] = useState(route.params.taskname);
   const [selected, setSelected] = useState(null);
-  const [instructions, setInstructions] = useState(
-    route.params.instructions.map((e) => {
-      return { ...e, mute: false };
-    })
+  const [instructions, setInstructions] = useState(route.params.instructions);
+  const [instructionsOriginal, setInstructionsOriginal] = useState(
+    route.params.instructions
   );
 
+  const [taskId, setTaskId] = useState(route.params.taskId);
   const moveItem = (from, to) => {
     const instructionsCopy = [...instructions];
     // remove `from` item and store it
@@ -80,14 +81,25 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
                 marginRight: 10,
                 backgroundColor: "#2A9D8F",
               }}
-              // onPress={() => {
-              //   navigation.navigate("AdminInstructionEdit", {
-              //     taskname: taskname,
-              //     instruction: "",
-              //     image: null,
-              //     audio: null,
-              //   });
-              // }}
+              onPress={() => {
+                console.log(taskId);
+                dbh
+                  .collection("Tasks")
+                  .doc(taskId)
+                  .update({
+                    instructions: [...instructions],
+                  })
+                  .then(() => {
+                    setInstructionsOriginal(instructions);
+                    Toast.show({
+                      text: "Saved Successfully!",
+                      // buttonText: "Okay",
+                      type: "success",
+                      duration: 4000,
+                    });
+                    console.log("Task added/updated successfully!");
+                  });
+              }}
             >
               <Icon name="save" />
               <Text>Save</Text>
@@ -208,7 +220,7 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
           <Button
             onPress={() => {
               setSelected(null);
-              setInstructions(route.params.instructions);
+              setInstructions(instructionsOriginal);
             }}
           >
             <Icon style={styles.footerTabIcon} name="refresh" />
@@ -262,6 +274,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginBottom: 30,
     fontFamily: "Rubik",
+    width: wp("60%"),
   },
   buttonText: {
     fontSize: hp("4%"),
