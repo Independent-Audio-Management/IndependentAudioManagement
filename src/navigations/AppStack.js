@@ -1,6 +1,7 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import * as React from "react";
 import AdminInstructionEditScreen from "../screens/Admin/AdminInstructionEditScreen";
+import AdminInstructionOrderScreen from "../screens/Admin/AdminInstructionOrderScreen";
 import AdminPincodeScreen from "../screens/Admin/AdminPincodeScreen";
 import AdminTaskEditScreen from "../screens/Admin/AdminTaskEditScreen";
 import AdminTaskScreen from "../screens/Admin/AdminTaskScreen";
@@ -23,6 +24,10 @@ const AppStack = () => {
       <Stack.Screen name="AdminTask" component={AdminTaskScreen} />
       <Stack.Screen name="AdminPincode" component={AdminPincodeScreen} />
       <Stack.Screen name="AdminTaskEdit" component={AdminTaskEditScreen} />
+      <Stack.Screen
+        name="AdminInstructionOrder"
+        component={AdminInstructionOrderScreen}
+      />
       <Stack.Screen
         name="AdminInstructionEdit"
         component={AdminInstructionEditScreen}

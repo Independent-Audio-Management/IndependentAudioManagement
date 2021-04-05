@@ -2,7 +2,7 @@ import { Audio } from "expo-av";
 import { useFonts } from "expo-font";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
-import uuid from "react-native-uuid";
+import uuid from "uuid";
 import {
   Button,
   Container,
@@ -36,7 +36,9 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
   const [name, setName] = useState();
   const [taskId, setTaskId] = useState(route.params.taskId);
   const [taskName, setTaskName] = useState(route.params.taskname);
-  const [instructionName, setInstructionName] = useState("");
+  const [instructionName, setInstructionName] = useState(
+    route.params.instruction
+  );
   const [steps, setSteps] = useState([
     { id: 1, step: 1 },
     { id: 2, step: 2 },
@@ -56,8 +58,8 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
   //     new Date(route.params.time * 1000)
   //   );
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
-  const [image, setImage] = useState(null);
-  const [recording, setRecording] = useState();
+  const [image, setImage] = useState(route.params.image);
+  const [recording, setRecording] = useState(route.params.audio);
   const [sound, setSound] = useState();
   const [recordingURI, setRecordingURI] = useState(null);
   const [savingState, setSavingState] = useState(false);
@@ -282,7 +284,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
             }}
             onPress={() => addStep(image, recordingURI)}
           >
-            <Icon name="cog" />
+            <Icon name="save" />
             <Text>Save</Text>
           </Button>
         </View>
@@ -308,7 +310,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
         </View>
         <Item style={styles.taskNameBox} floatingLabel>
           <Label style={{ color: "#737568", fontFamily: "Rubik" }}>
-            Instruction Name
+            Instruction
           </Label>
           <Input
             style={{ fontFamily: "Rubik" }}
@@ -357,7 +359,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
         </View>
         <Item style={styles.taskCategory} floatingLabel>
           <Label style={{ color: "#737568", fontFamily: "Rubik" }}>
-            Instruction Duration
+            Instruction Duration (Seconds)
           </Label>
           <Input
             style={{ fontFamily: "Rubik" }}
@@ -422,7 +424,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
           // uploadRecording(recordingURI);
           // console.log(imageFireURL);
           // uploadRecording();
-          navigation.navigate("AdminTaskEdit");
+          navigation.navigate("AdminInstructionOrder");
         }}
       >
         <Image
