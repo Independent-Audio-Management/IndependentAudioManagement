@@ -27,70 +27,71 @@ export default function TaskScreen({ navigation }) {
   });
 
   useEffect(() => {
-    dbh
-      .collection("Users")
-      .doc(`${uid}`)
-      .get()
-      .then((querySnapshot) => {
-        const defaultPath = querySnapshot.data().defaultPath;
-        const onValueChange = db
-          .ref(`${defaultPath}`)
-          .on("value", (snapshot) => {
-            let dbTasks = snapshot.val();
-            let keys = Object.keys(dbTasks);
-            findNextTask(dbTasks, keys);
-            const categorySet = new Set(
-              keys.map((key) => dbTasks[key].category)
-            );
-            console.log([...categorySet]);
-            const fetchedTasks = [...categorySet]
-              .map((category) => {
-                const task1d = keys
-                  .filter(
-                    (key) =>
-                      dbTasks[key].category === category &&
-                      dbTasks[key].disabled === false
-                  )
-                  .map((key) => {
-                    return { id: key, ...dbTasks[key] };
-                  });
-                var tasks2d = [];
-                while (task1d.length) tasks2d.push(task1d.splice(0, 2));
-                return { category: category, tasks: tasks2d };
-              })
-              .filter((elem) => elem.tasks.length > 0);
-            setTasks(fetchedTasks);
-          });
-        // Stop listening for updates when no longer required
-        return () => db.ref(`${defaultPath}`).off("value", onValueChange);
-      });
+    setAllTasks();
   }, []);
+
+  const setAllTasks = async () => {
+    const userRef = dbh.collection("Users").doc(`${uid}`);
+    const user = await userRef.get();
+    const taskIds = user.data().tasks;
+    const dbTasks = await Promise.all(
+      taskIds.map(async (dbTaskId) => {
+        const taskRef = dbh.collection("Tasks").doc(`${dbTaskId}`);
+        const dbTask = await taskRef.get();
+        return { ...dbTask.data() };
+      })
+    );
+    findNextTask(dbTasks);
+
+    const categorySet = new Set(dbTasks.map((currTask) => currTask.category));
+
+    const fetchedTasks = [...categorySet]
+      .map((category) => {
+        const task1d = dbTasks
+          .filter(
+            (dbTask) =>
+              dbTask.category === category && dbTask.disabled === false
+          )
+          .map((elem) => {
+            return { ...elem };
+          });
+        var tasks2d = [];
+        while (task1d.length) tasks2d.push(task1d.splice(0, 2));
+        return { category: category, tasks: tasks2d };
+      })
+      .filter((elem) => elem.tasks.length > 0);
+    setTasks(fetchedTasks);
+  };
 
   // const getRandomInt = (max) => {
   //   return Math.floor(Math.random() * Math.floor(max));
   // };
 
-  const findNextTask = (tasks, keys) => {
-    const sortedTasks = keys
-      .map((key) => tasks[key])
+  const findNextTask = (task1d) => {
+    const sortedTasks = task1d
       .filter((task) => task.disabled === false)
       .sort((a, b) => {
-        const aDate = new Date(a.time * 1000);
-        const bDate = new Date(b.time * 1000);
-        // compare hours first
-        if (aDate.getHours() < bDate.getHours()) return -1;
-        if (aDate.getHours() > bDate.getHours()) return 1;
+        // const aDate = new Date(a.time * 1000);
+        // const bDate = new Date(b.time * 1000);
 
-        // else a.hour === b.hour, so compare minutes to break the tie
-        if (aDate.getMinutes() < bDate.getMinutes()) return -1;
-        if (aDate.getMinutes() > bDate.getMinutes()) return 1;
+        // compare hours first
+        // if (aDate.getHours() < bDate.getHours()) return -1;
+        // if (aDate.getHours() > bDate.getHours()) return 1;
+
+        // // else a.hour === b.hour, so compare minutes to break the tie
+        // if (aDate.getMinutes() < bDate.getMinutes()) return -1;
+        // if (aDate.getMinutes() > bDate.getMinutes()) return 1;
+
+        if (a.time.seconds < b.time.seconds) return -1;
+        if (b.time.seconds > b.time.seconds) return 1;
 
         // couldn't break the tie
         return 0;
       });
     const nextTask = sortedTasks.find((e) => {
       const currentTime = new Date();
-      const taskTime = new Date(e.time * 1000);
+      const taskTime = e.time.toDate();
+      console.log(e.name);
       if (currentTime.getHours() < taskTime.getHours()) return true;
       if (
         currentTime.getHours() === taskTime.getHours() &&

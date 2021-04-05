@@ -41,7 +41,7 @@ export default function AdminTaskEditScreen({ navigation, route }) {
   console.log(instructions);
   const [toggleCheckBox, setToggleCheckBox] = useState(true);
   const [selectedTime, setSelectedTime] = useState(
-    route.params.time === "" ? new Date() : new Date(route.params.time * 1000)
+    route.params.time === "" ? new Date() : route.params.time.toDate()
   );
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
   const [image, setImage] = useState(route.params.image);
