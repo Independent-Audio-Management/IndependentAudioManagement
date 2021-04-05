@@ -10,7 +10,6 @@ import {
   Input,
   Item,
   Label,
-  Picker,
   Text,
   Toast,
 } from "native-base";
@@ -26,38 +25,23 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
-import { db, dbh, storage } from "../../utils/firebase";
+import { dbh, storage } from "../../utils/firebase";
 
 export default function AdminInstructionEditScreen({ navigation, route }) {
-  const [userId, settUserId] = useState("36112759-7710-4c22-b63b-8433b507f02e");
   const [loaded] = useFonts({
     Rubik: require("../../assets/fonts/Rubik-Medium.ttf"),
   });
-  const [name, setName] = useState();
   const [taskId, setTaskId] = useState(route.params.taskId);
   const [taskName, setTaskName] = useState(route.params.taskname);
   const [instructionName, setInstructionName] = useState(
     route.params.instruction
   );
-  const [steps, setSteps] = useState([
-    { id: 1, step: 1 },
-    { id: 2, step: 2 },
-    { id: 3, step: 3 },
-    { id: 4, step: 4 },
-    { id: 5, step: 5 },
-    { id: 6, step: 6 },
-  ]);
   // const [step, setStep] = useState(
   //   Math.max(...steps.map((stepObj) => stepObj.step), 0) + 1
   // );
   const [step, setStep] = useState(1);
   const [stepId, setStepId] = useState(uuid.v4());
-  const [instructionDuration, setInstructionDuration] = useState("");
-  const [toggleCheckBox, setToggleCheckBox] = useState(true);
-  //   const [selectedTime, setSelectedTime] = useState(
-  //     new Date(route.params.time * 1000)
-  //   );
-  const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
+  const [duration, setDuration] = useState(route.params.duration);
   const [image, setImage] = useState(route.params.image);
   const [recording, setRecording] = useState(route.params.audio);
   const [sound, setSound] = useState();
@@ -75,20 +59,13 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
         }
       }
     })();
-    const onValueChange = db
-      .ref(`/users/${userId}/name`)
-      .on("value", (snapshot) => {
-        setName(snapshot.val());
-      });
-    // Stop listening for updates when no longer required
     sound
       ? () => {
           console.log("Unloading Sound");
           sound.unloadAsync();
         }
       : undefined;
-    return () => db.ref(`/users/${userId}`).off("value", onValueChange);
-  }, [userId, sound]);
+  }, [sound]);
 
   async function startRecording() {
     try {
@@ -191,7 +168,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
         text: instructionName,
         step: step,
         id: stepId,
-        duration: instructionDuration,
+        duration: duration,
       };
 
       uploadImage(imageURI).then((url) => {
@@ -365,65 +342,16 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
             style={{ fontFamily: "Rubik" }}
             returnKeyType={Platform.OS === "ios" ? "done" : "next"}
             keyboardType="numeric"
-            onChangeText={(text) =>
-              setInstructionDuration(text.replace(/[^0-9]/g, ""))
-            }
-            value={instructionDuration}
+            onChangeText={(text) => setDuration(text.replace(/[^0-9]/g, ""))}
+            value={duration.toString()}
           />
         </Item>
-        {/* <Item picker style={styles.taskCategory}>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text style={{ color: "#737568", fontFamily: "Rubik" }}>
-              Category
-            </Text>
-            <Picker
-              mode="dropdown"
-              iosIcon={<Icon name="arrow-down" style={{ color: "#737568" }} />}
-              style={{ width: undefined }}
-              placeholder="Select category"
-              placeholderStyle={{ color: "#737568", fontFamily: "Rubik" }}
-              textStyle={{ fontFamily: "Rubik" }}
-              itemTextStyle={{ fontFamily: "Rubik" }}
-              // placeholderStyle={{ color: "#bfc6ea" }}
-              //   placeholderIconColor="#007aff"
-              selectedValue={step}
-              onValueChange={(value) => setStep(value)}
-            >
-              {Array.from({ length: step }, (x, i) => (
-                <Picker.Item label={"Step " + (i + 1)} value={i + 1} />
-              ))}
-            </Picker>
-          </View>
-        </Item> */}
       </Container>
 
       <Button
         disabled={savingState}
         style={styles.backButton}
         onPress={() => {
-          // let newSteps = [...steps];
-          // newSteps.filter((obj) => {
-          //   if (obj.step >= step) {
-          //     obj.step = obj.step + 1;
-          //   }
-          // });
-          // const newId =
-          //   Math.max(...newSteps.map((stepObj) => stepObj.id), 0) + 1;
-          // newSteps.push({ id: newId, step: step });
-          // setSteps(newSteps);
-          // console.log(newSteps);
-          // uploadImage(image);
-          // addStep(image, recordingURI);
-          // uploadRecording(recordingURI);
-          // console.log(imageFireURL);
-          // uploadRecording();
           navigation.navigate("AdminInstructionOrder");
         }}
       >

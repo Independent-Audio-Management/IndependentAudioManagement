@@ -115,7 +115,7 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
                   }}
                 >
                   <View>
-                    {selected == step.text && i != 0 && (
+                    {selected == step.id && i != 0 && (
                       <Button
                         success
                         transparent
@@ -154,22 +154,23 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => {
-                        //TODO: Change to step.id
-                        if (step.text != selected) {
-                          setSelected(step.text);
+                        console.log(step.duration);
+                        if (step.id != selected) {
+                          setSelected(step.id);
                         } else {
                           navigation.navigate("AdminInstructionEdit", {
                             taskname: taskname,
                             instruction: step.text,
                             image: step.image,
                             audio: step.audio,
+                            duration: step.duration,
                           });
                         }
                       }}
                     >
                       <Card
                         style={
-                          selected == step.text
+                          selected == step.id
                             ? styles.cardSelected
                             : styles.card
                         }
@@ -177,14 +178,14 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
                         <CardItem
                           cardBody
                           style={
-                            selected == step.text
+                            selected == step.id
                               ? { backgroundColor: "#3ebdae" }
                               : { backgroundColor: "white" }
                           }
                         >
                           <Text
                             style={
-                              selected == step.text
+                              selected == step.id
                                 ? { fontWeight: "bold", color: "white" }
                                 : null
                             }
@@ -196,7 +197,7 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
                     </TouchableOpacity>
                   </View>
                   <View>
-                    {selected == step.text && i != instructions.length - 1 && (
+                    {selected == step.id && i != instructions.length - 1 && (
                       <Button
                         success
                         transparent
@@ -232,6 +233,7 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
                 instruction: "",
                 image: null,
                 audio: null,
+                duration: "",
               });
             }}
           >
