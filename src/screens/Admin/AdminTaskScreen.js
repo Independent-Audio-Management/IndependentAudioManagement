@@ -17,81 +17,53 @@ import {
 } from "react-native-responsive-screen";
 import { AuthUserContext } from "../../navigations/AuthUserProvider";
 import { db, dbh } from "../../utils/firebase";
+import uuid from "uuid";
 
 export default function AdminTaskScreen({ navigation }) {
   const { user } = useContext(AuthUserContext);
   const [uid] = useState(user.uid);
   const [tasks, setTasks] = useState([]);
   const [tasksp, setTasksp] = useState([]);
+  // const [dbTasksw, setDbTasks] = useState(null);
   const [highlight, setHighlight] = useState(null);
   const [loaded] = useFonts({
     Rubik: require("../../assets/fonts/Rubik-Regular.ttf"),
   });
 
   useEffect(() => {
-    //To grab default tasks
-    setDefaultTasks();
-    //Personal Tasks
-    setPersonalTasks();
-    // Stop listening for updates when no longer required
-    // return () => db.ref(`${defaultPath}`).off("value", onValueChange);
+    setAllTasks();
   }, []);
 
-  const setDefaultTasks = () => {
-    dbh
-      .collection("Users")
-      .doc(`${uid}`)
-      .get()
-      .then((querySnapshot) => {
-        //Default tasks
-        const defaultPath = querySnapshot.data().defaultPath;
-        const onValueChange = db
-          .ref(`${defaultPath}`)
-          .on("value", (snapshot) => {
-            let dbTasks = snapshot.val();
-            let keys = Object.keys(dbTasks);
-            const categorySet = new Set(
-              keys.map((key) => dbTasks[key].category)
-            );
-            const fetchedTasks = [...categorySet]
-              .map((category) => {
-                const task1d = keys
-                  .filter(
-                    (key) =>
-                      dbTasks[key].category === category &&
-                      dbTasks[key].disabled === false
-                  )
-                  .map((key) => {
-                    return { id: key, ...dbTasks[key] };
-                  });
-                var tasks2d = [];
-                while (task1d.length) tasks2d.push(task1d.splice(0, 2));
-                return { category: category, tasks: tasks2d };
-              })
-              .filter((elem) => elem.tasks.length > 0);
-            setTasks(fetchedTasks);
-          });
-      });
-  };
+  const setAllTasks = async () => {
+    const userRef = dbh.collection("Users").doc(`${uid}`);
+    const user = await userRef.get();
+    const taskIds = user.data().tasks;
+    const dbTasks = await Promise.all(
+      taskIds.map(async (dbTaskId) => {
+        const taskRef = dbh.collection("Tasks").doc(`${dbTaskId}`);
+        const dbTask = await taskRef.get();
+        return { ...dbTask.data() };
+      })
+    );
 
-  const setPersonalTasks = () => {
-    dbh
-      .collection("Users")
-      .doc(`${uid}`)
-      .get()
-      .then((querySnapshot) => {
-        const personalTaskId = querySnapshot.data().tasks;
-        personalTaskId.forEach((id) => {
-          dbh
-            .collection("Tasks")
-            .doc(`${id}`)
-            .get()
-            .then((querySnapshot) => {
-              const taskItem = querySnapshot.data();
-              setTasksp([...tasksp, taskItem]);
-            });
-        });
-      });
+    const categorySet = new Set(dbTasks.map((currTask) => currTask.category));
+
+    const fetchedTasks = [...categorySet]
+      .map((category) => {
+        const task1d = dbTasks
+          .filter(
+            (dbTask) =>
+              dbTask.category === category && dbTask.disabled === false
+          )
+          .map((elem) => {
+            return { ...elem };
+          });
+        var tasks2d = [];
+        while (task1d.length) tasks2d.push(task1d.splice(0, 2));
+        return { category: category, tasks: tasks2d };
+      })
+      .filter((elem) => elem.tasks.length > 0);
+    setTasks(fetchedTasks);
   };
 
   return (
