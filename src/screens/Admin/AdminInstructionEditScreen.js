@@ -284,7 +284,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
             }}
             onPress={() => addStep(image, recordingURI)}
           >
-            <Icon name="cog" />
+            <Icon name="save" />
             <Text>Save</Text>
           </Button>
         </View>
@@ -359,7 +359,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
         </View>
         <Item style={styles.taskCategory} floatingLabel>
           <Label style={{ color: "#737568", fontFamily: "Rubik" }}>
-            Instruction Duration
+            Instruction Duration (Seconds)
           </Label>
           <Input
             style={{ fontFamily: "Rubik" }}
