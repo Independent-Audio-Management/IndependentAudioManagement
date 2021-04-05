@@ -1,7 +1,7 @@
 import { useFonts } from "expo-font";
 import { LinearGradient } from "expo-linear-gradient";
 import { storage } from "firebase";
-import { Button, Card, CardItem, Text } from "native-base";
+import { Button, Card, CardItem, Text, Icon } from "native-base";
 import React, { useContext, useEffect, useState } from "react";
 import {
   Image,
@@ -113,7 +113,13 @@ export default function AdminTaskScreen({ navigation }) {
           zIndex: 1,
         }}
       >
-        <TouchableOpacity
+        <Button
+          iconLeft
+          rounded
+          style={{
+            marginRight: 10,
+            backgroundColor: "#2A9D8F",
+          }}
           onPress={() => {
             var newDocRef = dbh.collection("Tasks").doc();
             newDocRef.set({});
@@ -136,18 +142,10 @@ export default function AdminTaskScreen({ navigation }) {
               audio: null,
             });
           }}
-          style={{ marginRight: 30, marginTop: 10 }}
         >
-          <Image
-            source={require("../../assets/icons/add.png")}
-            style={{
-              width: wp("20%"),
-              height: wp("10%"),
-              aspectRatio: 1,
-            }}
-            fadeDuration={0}
-          />
-        </TouchableOpacity>
+          <Icon name="add" />
+          <Text>Add</Text>
+        </Button>
       </View>
       <ScrollView style={{ marginBottom: 100, marginTop: -50 }}>
         {tasks.map((elem, i) => {

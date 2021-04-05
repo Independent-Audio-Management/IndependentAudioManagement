@@ -13,6 +13,8 @@ import {
   Text,
   Card,
   CardItem,
+  Footer,
+  FooterTab,
 } from "native-base";
 import React, { useEffect, useState } from "react";
 import {
@@ -38,6 +40,15 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
       return { ...e, mute: false };
     })
   );
+
+  const moveItem = (from, to) => {
+    const instructionsCopy = [...instructions];
+    // remove `from` item and store it
+    var shifted = instructionsCopy.splice(from, 1)[0];
+    // insert stored item into position `to`
+    instructionsCopy.splice(to, 0, shifted);
+    setInstructions(instructionsCopy);
+  };
 
   return (
     <>
@@ -69,20 +80,20 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
                 marginRight: 10,
                 backgroundColor: "#2A9D8F",
               }}
-              onPress={() => {
-                navigation.navigate("AdminInstructionEdit", {
-                  taskname: taskname,
-                  instruction: "",
-                  image: null,
-                  audio: null,
-                });
-              }}
+              // onPress={() => {
+              //   navigation.navigate("AdminInstructionEdit", {
+              //     taskname: taskname,
+              //     instruction: "",
+              //     image: null,
+              //     audio: null,
+              //   });
+              // }}
             >
-              <Icon name="add" />
-              <Text>Add</Text>
+              <Icon name="save" />
+              <Text>Save</Text>
             </Button>
           </View>
-          <ScrollView style={{ marginBottom: 100 }}>
+          <ScrollView>
             {instructions.map((step, i) => {
               return (
                 <View
@@ -92,8 +103,12 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
                   }}
                 >
                   <View>
-                    {selected == step.text && (
-                      <Button success transparent>
+                    {selected == step.text && i != 0 && (
+                      <Button
+                        success
+                        transparent
+                        onPress={() => moveItem(i, i - 1)}
+                      >
                         <Icon name="arrow-up" />
                       </Button>
                     )}
@@ -169,8 +184,12 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
                     </TouchableOpacity>
                   </View>
                   <View>
-                    {selected == step.text && (
-                      <Button success transparent>
+                    {selected == step.text && i != instructions.length - 1 && (
+                      <Button
+                        success
+                        transparent
+                        onPress={() => moveItem(i, i + 1)}
+                      >
                         <Icon name="arrow-down" />
                       </Button>
                     )}
@@ -181,23 +200,33 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
           </ScrollView>
         </SafeAreaView>
       </Container>
-      <Button
-        style={styles.backButton}
-        onPress={() => {
-          navigation.navigate("AdminTaskEdit");
-        }}
-      >
-        <Image
-          source={require("../../assets/icons/back.png")}
-          fadeDuration={0}
-          style={{
-            width: wp("10%"),
-            aspectRatio: 1,
-            resizeMode: "contain",
-          }}
-        />
-        <Text style={styles.buttonText}>Back to Task</Text>
-      </Button>
+      <Footer style={styles.footerTab}>
+        <FooterTab>
+          <Button onPress={() => navigation.navigate("AdminTaskEdit")}>
+            <Icon style={styles.footerTabIcon} name="undo" />
+          </Button>
+          <Button
+            onPress={() => {
+              setSelected(null);
+              setInstructions(route.params.instructions);
+            }}
+          >
+            <Icon style={styles.footerTabIcon} name="refresh" />
+          </Button>
+          <Button
+            onPress={() => {
+              navigation.navigate("AdminInstructionEdit", {
+                taskname: taskname,
+                instruction: "",
+                image: null,
+                audio: null,
+              });
+            }}
+          >
+            <Icon style={styles.footerTabIcon} name="create" />
+          </Button>
+        </FooterTab>
+      </Footer>
     </>
   );
 }
@@ -227,33 +256,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     // justifyContent: "center",
     textAlign: "center",
-  },
-  card1: {
-    height: hp("33%"),
-    width: wp("75%"),
-    margin: 0,
-    padding: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 45,
-    shadowColor: "black",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: -15, height: 15 },
-  },
-  card2: {
-    height: hp("33%"),
-    width: wp("75%"),
-    margin: 0,
-    padding: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 45,
-    marginTop: 30,
-    shadowColor: "black",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: -15, height: 15 },
   },
   title: {
     fontSize: hp("4%"),
@@ -296,14 +298,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
   },
-  record: {
-    width: wp("25%"),
-    height: wp("25%"),
-  },
-  play: {
-    width: wp("25%"),
-    height: wp("25%"),
-  },
   card: {
     height: hp("8%"),
     width: wp("80%"),
@@ -328,5 +322,13 @@ const styles = StyleSheet.create({
     // shadowOpacity: 0.5,
     // shadowRadius: 5,
     // shadowOffset: { width: -5, height: 5 },
+  },
+  footerTab: {
+    // backgroundColor: "#4f9b8f",
+    backgroundColor: "#2A9D8F",
+  },
+  footerTabIcon: {
+    color: "white",
+    fontSize: 35,
   },
 });

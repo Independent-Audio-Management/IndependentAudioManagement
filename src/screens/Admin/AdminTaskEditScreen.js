@@ -200,7 +200,6 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               .then(() => {
                 Toast.show({
                   text: "Task deleted successfully!",
-                  // buttonText: "Okay",
                   type: "warning",
                   duration: 3000,
                 });
@@ -228,7 +227,6 @@ export default function AdminTaskEditScreen({ navigation, route }) {
         />
         <View
           style={{
-            // alignSelf: "flex-end",
             position: "absolute",
             top: 0,
             right: 0,
@@ -247,7 +245,7 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               addTask(taskName, category, toggleCheckBox, selectedTime, image)
             }
           >
-            <Icon name="cog" />
+            <Icon name="save" />
             <Text>Save</Text>
           </Button>
         </View>
@@ -285,8 +283,6 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               placeholderStyle={{ color: "#737568", fontFamily: "Rubik" }}
               textStyle={{ fontFamily: "Rubik" }}
               itemTextStyle={{ fontFamily: "Rubik" }}
-              // placeholderStyle={{ color: "#bfc6ea" }}
-              //   placeholderIconColor="#007aff"
               selectedValue={category}
               onValueChange={(value) => {
                 setCategory(value);
@@ -326,15 +322,6 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               color="#737568"
               onPress={showTimePicker}
             />
-            {/* <TouchableOpacity
-              // fontWeight="400"
-              // fontFamily="Rubik"
-              // title="Set time"
-              // color="lightgrey"
-              onPress={showTimePicker}
-            >
-              <Text style={{ color: "lightgrey" }}>Set time</Text>
-            </TouchableOpacity> */}
             <DateTimePickerModal
               isVisible={isTimePickerVisible}
               date={selectedTime}
@@ -364,32 +351,6 @@ export default function AdminTaskEditScreen({ navigation, route }) {
             onPress={pickImage}
           />
         </View>
-        {/* <TouchableOpacity onPress={() => navigation.navigate("QR")}>
-        <Card style={styles.card1}>
-          <CardItem cardBody>
-            <Image
-              source={require("../../assets/images/scanQR.png")}
-              style={{ width: hp("23%"), aspectRatio: 1 }}
-            />
-          </CardItem>
-          <CardItem cardBody>
-            <Text style={styles.buttonText}>Scan</Text>
-          </CardItem>
-        </Card>
-      </TouchableOpacity> */}
-        {/* <TouchableOpacity onPress={() => navigation.navigate("Task")}>
-          <Card style={styles.card2}>
-            <CardItem cardBody>
-              <Image
-                source={require("../../assets/images/tasks.png")}
-                style={{ width: hp("23%"), aspectRatio: 1 }}
-              />
-            </CardItem>
-            <CardItem cardBody>
-              <Text style={styles.buttonText}>Tasks</Text>
-            </CardItem>
-          </Card>
-        </TouchableOpacity> */}
       </Container>
       <Footer style={styles.footerTab}>
         <FooterTab>
@@ -407,7 +368,7 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               }
             }}
           >
-            <Icon style={styles.footerTabIcon} name="apps" />
+            <Icon style={styles.footerTabIcon} name="undo" />
           </Button>
           <Button
             onPress={() =>
@@ -416,69 +377,12 @@ export default function AdminTaskEditScreen({ navigation, route }) {
                 instructions: route.params.instructions,
               })
             }
-            // onPress={() => {
-            //   if (
-            //     taskName !== "" &&
-            //     category !== "" &&
-            //     image !== null &&
-            //     savedState
-            //   ) {
-            //     navigation.navigate("AdminInstructionEdit", {
-            //       taskId: taskId,
-            //       taskname: taskName,
-            //     });
-            //   } else {
-            //     Toast.show({
-            //       text: "Please add task details and save",
-            //       // buttonText: "Okay",
-            //       type: "danger",
-            //       duration: 3000,
-            //     });
-            //   }
-            // }}
           >
-            <Icon style={styles.footerTabIcon} name="create" />
+            <Icon style={styles.footerTabIcon} name="list" />
           </Button>
           <Button
             onPress={() => {
               deleteTask();
-              // console.log(ref.listAll());
-              // ref.listAll().then((dir) => {
-              //   dir.items.forEach((fileRef) => {
-              //     console.log(fileRef.fullPath);
-              //     // deleteFile(ref.fullPath, fileRef.name);
-              //   });
-              //   // dir.prefixes.forEach((folderRef) => {
-              //   //   deleteFolderContents(folderRef.fullPath);
-              //   // });
-              // });
-              // // .catch((error) => {
-              // //   console.log(error);
-              // // });
-              // console.log("H");
-              // dbh
-              //   .collection("Tasks")
-              //   .doc(taskId)
-              //   .delete()
-              //   .then(() => {
-              //     Toast.show({
-              //       text: "Task deleted successfully!",
-              //       // buttonText: "Okay",
-              //       type: "warning",
-              //       duration: 4000,
-              //     });
-              //     console.log("Task deleted successfully!");
-              //   });
-              // storage
-              //   .ref()
-              //   .child(taskId + "/")
-              //   .delete()
-              //   .then(() => {
-
-              //   })
-              //   .catch((error) => {
-              //     // Uh-oh, an error occurred!
-              //   });
             }}
           >
             <Icon style={styles.footerTabIcon} name="trash" />
