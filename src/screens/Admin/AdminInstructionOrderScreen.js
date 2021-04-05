@@ -32,6 +32,7 @@ import { db } from "../../utils/firebase";
 
 export default function AdminInstructionOrderScreen({ navigation, route }) {
   const [taskname] = useState(route.params.taskname);
+  const [selected, setSelected] = useState(null);
   const [instructions, setInstructions] = useState(
     route.params.instructions.map((e) => {
       return { ...e, mute: false };
@@ -53,12 +54,22 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
         />
         <SafeAreaView>
           <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              width: wp("90%"),
+              marginTop: 20,
+            }}
           >
             <Text style={styles.title}>{taskname}</Text>
-            <TouchableOpacity
+            <Button
+              iconLeft
+              rounded
+              style={{
+                marginRight: 10,
+                backgroundColor: "#2A9D8F",
+              }}
               onPress={() => {
-                //             var newCityRef = dbh.collection("cities").doc();
                 navigation.navigate("AdminInstructionEdit", {
                   taskname: taskname,
                   instruction: "",
@@ -66,65 +77,104 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
                   audio: null,
                 });
               }}
-              style={{ marginTop: 20 }}
             >
-              <Image
-                source={require("../../assets/icons/add.png")}
-                style={{
-                  width: wp("20%"),
-                  height: wp("10%"),
-                  aspectRatio: 1,
-                }}
-                fadeDuration={0}
-              />
-            </TouchableOpacity>
+              <Icon name="add" />
+              <Text>Add</Text>
+            </Button>
           </View>
           <ScrollView style={{ marginBottom: 100 }}>
             {instructions.map((step, i) => {
               return (
-                <View style={{ flexDirection: "row" }}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      let newMute = { ...step, mute: !step.mute };
-                      let newInstructions = [...instructions];
-                      newInstructions[i] = newMute;
-                      setInstructions(newInstructions);
-                    }}
-                    style={{ marginTop: 20 }}
+                <View
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <View>
+                    {selected == step.text && (
+                      <Button success transparent>
+                        <Icon name="arrow-up" />
+                      </Button>
+                    )}
+                  </View>
+                  <View
+                    style={{ flexDirection: "row" }}
+                    key={"instruction" + i}
                   >
-                    <Image
-                      source={
-                        step.mute
-                          ? require("../../assets/icons/mute.png")
-                          : require("../../assets/icons/unmute.png")
-                      }
-                      style={{
-                        width: wp("20%"),
-                        height: wp("10%"),
-                        aspectRatio: 1,
+                    <TouchableOpacity
+                      onPress={() => {
+                        let newMute = { ...step, mute: !step.mute };
+                        let newInstructions = [...instructions];
+                        newInstructions[i] = newMute;
+                        setInstructions(newInstructions);
                       }}
-                      fadeDuration={0}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate("AdminInstructionEdit", {
-                        taskname: taskname,
-                        instruction: step.text,
-                        image: step.image,
-                        audio: step.audio,
-                      })
-                    }
-                  >
-                    <Card style={styles.card}>
-                      <CardItem cardBody>
-                        <Text>{step.text}</Text>
-                      </CardItem>
-                      {/* <CardItem cardBody>
-                  <Text style={styles.buttonText}>Scan</Text>
-                </CardItem> */}
-                    </Card>
-                  </TouchableOpacity>
+                      style={{ marginTop: 20 }}
+                    >
+                      <Image
+                        source={
+                          step.mute
+                            ? require("../../assets/icons/mute.png")
+                            : require("../../assets/icons/unmute.png")
+                        }
+                        style={{
+                          width: wp("20%"),
+                          height: wp("10%"),
+                          aspectRatio: 1,
+                        }}
+                        fadeDuration={0}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        //TODO: Change to step.id
+                        if (step.text != selected) {
+                          setSelected(step.text);
+                        } else {
+                          navigation.navigate("AdminInstructionEdit", {
+                            taskname: taskname,
+                            instruction: step.text,
+                            image: step.image,
+                            audio: step.audio,
+                          });
+                        }
+                      }}
+                    >
+                      <Card
+                        style={
+                          selected == step.text
+                            ? styles.cardSelected
+                            : styles.card
+                        }
+                      >
+                        <CardItem
+                          cardBody
+                          style={
+                            selected == step.text
+                              ? { backgroundColor: "#3ebdae" }
+                              : { backgroundColor: "white" }
+                          }
+                        >
+                          <Text
+                            style={
+                              selected == step.text
+                                ? { fontWeight: "bold", color: "white" }
+                                : null
+                            }
+                          >
+                            {step.text}
+                          </Text>
+                        </CardItem>
+                      </Card>
+                    </TouchableOpacity>
+                  </View>
+                  <View>
+                    {selected == step.text && (
+                      <Button success transparent>
+                        <Icon name="arrow-down" />
+                      </Button>
+                    )}
+                  </View>
                 </View>
               );
             })}
@@ -210,7 +260,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginBottom: 30,
     fontFamily: "Rubik",
-    marginTop: 20,
   },
   buttonText: {
     fontSize: hp("4%"),
@@ -260,7 +309,19 @@ const styles = StyleSheet.create({
     width: wp("80%"),
     paddingLeft: 15,
     justifyContent: "center",
-
+    // alignItems: "center",
+    borderRadius: 20,
+    // shadowColor: "black",
+    // shadowOpacity: 0.5,
+    // shadowRadius: 5,
+    // shadowOffset: { width: -5, height: 5 },
+  },
+  cardSelected: {
+    height: hp("8%"),
+    width: wp("80%"),
+    paddingLeft: 15,
+    justifyContent: "center",
+    backgroundColor: "#3ebdae",
     // alignItems: "center",
     borderRadius: 20,
     // shadowColor: "black",

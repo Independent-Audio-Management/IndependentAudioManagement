@@ -424,7 +424,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
           // uploadRecording(recordingURI);
           // console.log(imageFireURL);
           // uploadRecording();
-          navigation.navigate("AdminTaskEdit");
+          navigation.navigate("AdminInstructionOrder");
         }}
       >
         <Image
