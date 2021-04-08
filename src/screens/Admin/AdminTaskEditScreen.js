@@ -382,13 +382,27 @@ export default function AdminTaskEditScreen({ navigation, route }) {
             <Icon style={styles.footerTabIcon} name="undo" />
           </Button>
           <Button
-            onPress={() =>
-              navigation.navigate("AdminInstructionOrder", {
-                taskname: taskName,
-                instructions: route.params.instructions,
-                taskId: taskId,
-              })
-            }
+            onPress={() => {
+              if (
+                taskName !== "" &&
+                category !== "" &&
+                image !== null &&
+                savedState
+              ) {
+                navigation.navigate("AdminInstructionOrder", {
+                  taskId: taskId,
+                  taskname: taskName,
+                  instructions: route.params.instructions,
+                });
+              } else {
+                Toast.show({
+                  text: "Please add task details and save",
+                  // buttonText: "Okay",
+                  type: "danger",
+                  duration: 3000,
+                });
+              }
+            }}
           >
             <Icon style={styles.footerTabIcon} name="list" />
           </Button>
