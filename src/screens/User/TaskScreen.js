@@ -22,12 +22,12 @@ export default function TaskScreen({ navigation }) {
   const [uid] = useState(user.uid);
   const [tasks, setTasks] = useState([]);
   const [highlight, setHighlight] = useState(null);
+  const [isCancelled, setIsCancelled] = useState(false);
   const [loaded] = useFonts({
     Rubik: require("../../assets/fonts/Rubik-Regular.ttf"),
   });
 
   useEffect(() => {
-    let isCancelled = false;
     const fetchData = async () => {
       if (!isCancelled) {
         const userRef = dbh.collection("Users").doc(`${uid}`);

@@ -165,6 +165,7 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
                             image: step.image,
                             audio: step.audio,
                             duration: step.duration,
+                            taskId: taskId,
                           });
                         }
                       }}
@@ -235,6 +236,7 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
                 image: null,
                 audio: null,
                 duration: "",
+                taskId: taskId,
               });
             }}
           >
