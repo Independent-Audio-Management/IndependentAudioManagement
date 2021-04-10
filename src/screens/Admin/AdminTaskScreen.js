@@ -120,9 +120,9 @@ export default function AdminTaskScreen({ navigation }) {
         </Button>
       </View>
       <ScrollView style={{ marginBottom: 100, marginTop: -50 }}>
-        {tasks.map((elem) => {
+        {tasks.map((elem, i) => {
           return (
-            <View key={elem.id}>
+            <View key={elem.id} key={"row" + i}>
               <Text style={styles.subtitle}>{elem.category}</Text>
               {elem.tasks.map((taskRow, i) => {
                 return (

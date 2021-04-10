@@ -91,6 +91,7 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
                   })
                   .then(() => {
                     setInstructionsOriginal(instructions);
+                    setSelected(null);
                     Toast.show({
                       text: "Saved Successfully!",
                       // buttonText: "Okay",
