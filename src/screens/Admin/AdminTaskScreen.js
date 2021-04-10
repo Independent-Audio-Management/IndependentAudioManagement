@@ -34,13 +34,16 @@ export default function AdminTaskScreen({ navigation }) {
         const user = await userRef.get();
         const taskIds = user.data().tasks;
         const taskQuery = dbh.collection("Tasks").where("id", "in", taskIds);
-        const dbTasks = [];
+        // const dbTasks = [];
         taskQuery.onSnapshot(
           (querySnapshot) => {
             console.log(
               `Received query snapshot of size ${querySnapshot.size}`
             );
-            querySnapshot.forEach((doc) => dbTasks.push({ ...doc.data() }));
+            // querySnapshot.forEach((doc) => dbTasks.push({ ...doc.data() }));
+            const dbTasks = querySnapshot.docs.map((doc) => {
+              return { ...doc.data() };
+            });
             console.log(dbTasks.length);
             const categorySet = new Set(
               dbTasks.map((currTask) => currTask.category)
