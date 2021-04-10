@@ -123,8 +123,16 @@ export default function AdminSignUpScreen({ navigation }) {
                             .set({
                               ...values,
                               pin: pinArray,
-                              defaultPath:
-                                "/users/36112759-7710-4c22-b63b-8433b507f02e/tasks",
+                              tasks: [
+                                "22df0ac9-6cc6-4e4d-84e1-7adc99af384f",
+                                "4ceef351-8f34-4efd-b430-056759ae03de",
+                                "5d293771-cef7-4107-9104-12a4eff9ef5c",
+                                "8185e58b-85ca-45a1-8bdd-1896dcb3715d",
+                                "b728d994-b4bd-41dd-989f-58a840e51da7",
+                                "c7bbb12d-07c5-46e8-9f22-b960670a5b19",
+                                "e36040be-10f6-4699-be7b-1387c9322c56",
+                                "f83266d5-3ccd-4352-a069-ae71fb9f9be5",
+                              ],
                             });
                         });
                       } catch (error) {
