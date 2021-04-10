@@ -1,25 +1,38 @@
-import * as React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
+import * as React from "react";
+import AdminInstructionEditScreen from "../screens/Admin/AdminInstructionEditScreen";
+import AdminInstructionOrderScreen from "../screens/Admin/AdminInstructionOrderScreen";
+import AdminPincodeScreen from "../screens/Admin/AdminPincodeScreen";
+import AdminTaskEditScreen from "../screens/Admin/AdminTaskEditScreen";
+import AdminTaskScreen from "../screens/Admin/AdminTaskScreen";
 import HomeScreen from "../screens/HomeScreen";
+import CongratsScreen from "../screens/User/CongratsScreen";
+import InstructionScreen from "../screens/User/InstructionScreen";
 import QRScreen from "../screens/User/QRScreen";
 import TaskScreen from "../screens/User/TaskScreen";
-import { NavigationContainer } from "@react-navigation/native";
-import InstructionScreen from "../screens/User/InstructionScreen";
-import CongratsScreen from "../screens/User/CongratsScreen";
 
 const Stack = createStackNavigator();
 
 const AppStack = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home" headerMode="none">
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="QR" component={QRScreen} />
-        <Stack.Screen name="Task" component={TaskScreen} />
-        <Stack.Screen name="InstructionScreen" component={InstructionScreen} />
-        <Stack.Screen name="CongratsScreen" component={CongratsScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator initialRouteName="Home" headerMode="none">
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="QR" component={QRScreen} />
+      <Stack.Screen name="Task" component={TaskScreen} />
+      <Stack.Screen name="InstructionScreen" component={InstructionScreen} />
+      <Stack.Screen name="CongratsScreen" component={CongratsScreen} />
+      <Stack.Screen name="AdminTask" component={AdminTaskScreen} />
+      <Stack.Screen name="AdminPincode" component={AdminPincodeScreen} />
+      <Stack.Screen name="AdminTaskEdit" component={AdminTaskEditScreen} />
+      <Stack.Screen
+        name="AdminInstructionOrder"
+        component={AdminInstructionOrderScreen}
+      />
+      <Stack.Screen
+        name="AdminInstructionEdit"
+        component={AdminInstructionEditScreen}
+      />
+    </Stack.Navigator>
   );
 };
 

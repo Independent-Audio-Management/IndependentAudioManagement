@@ -1,11 +1,13 @@
 import React from "react";
-import { Provider } from "react-redux";
+import { Root } from "native-base";
 import store from "./src/app/store";
-import AppStack from "./src/navigations/AppStack";
+// import AppStack from "./src/navigations/AppStack";
+import Providers from "./src/navigations";
+
 export default function App() {
   return (
-    <Provider store={store}>
-      <AppStack />
-    </Provider>
+    <Root>
+      <Providers store={store} />
+    </Root>
   );
 }

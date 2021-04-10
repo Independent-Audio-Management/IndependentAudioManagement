@@ -1,4 +1,3 @@
-import * as firebase from "firebase";
 // const {
 //   apiKey,
 //   authDomain,
@@ -7,13 +6,13 @@ import * as firebase from "firebase";
 //   storageBucket,
 // } = getEnvVars();
 // Initialize Firebase
-const firebaseConfig = {
+export default {
   // apiKey: `${apiKey}`,
   // authDomain: `${authDomain}`,
   // databaseURL: `${databaseURL}`,
   // projectId: `${projectId}`,
   // storageBucket: `${storageBucket}`,
-  apiKey: "mAIzaSyDvYXRpVWA_4S39bJLocayCWDRAy738LO8",
+  apiKey: "AIzaSyDvYXRpVWA_4S39bJLocayCWDRAy738LO8",
   authDomain: "i-am-68785.firebaseapp.com",
   databaseURL: "https://i-am-68785.firebaseio.com",
   projectId: "i-am-68785",
@@ -23,4 +22,4 @@ const firebaseConfig = {
   measurementId: "G-measurement-id",
 };
 
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+// if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
