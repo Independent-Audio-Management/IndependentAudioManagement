@@ -18,7 +18,9 @@ import {
 } from "react-native-responsive-screen";
 
 export default function InstructionScreen({ navigation, route }) {
-  let [steps, setSteps] = useState(route.params.instructions);
+  let [steps, setSteps] = useState(
+    route.params.instructions.filter((step) => !step.mute)
+  );
   let [playbackInstance, setPlaybackInstance] = useState(new Audio.Sound());
   let [currentIndex, setCurrentIndex] = useState(0);
   let [volume, setVolume] = useState(1.0);

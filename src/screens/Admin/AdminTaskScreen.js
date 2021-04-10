@@ -27,40 +27,55 @@ export default function AdminTaskScreen({ navigation }) {
   });
 
   useEffect(() => {
-    setAllTasks();
+    let isCancelled = false;
+    const fetchData = async () => {
+      if (!isCancelled) {
+        const userQuery = dbh.collection("Users").doc(`${uid}`);
+        const user = await userQuery.get();
+        const taskIds = user.data().tasks;
+        console.log(taskIds);
+        const taskQuery = dbh.collection("Tasks").where("id", "in", taskIds);
+        taskQuery.onSnapshot(
+          (querySnapshot) => {
+            console.log(
+              `Received query snapshot of size ${querySnapshot.size}`
+            );
+            const dbTasks = querySnapshot.docs.map((doc) => {
+              return { ...doc.data() };
+            });
+            console.log(dbTasks.length);
+            const categorySet = new Set(
+              dbTasks.map((currTask) => currTask.category)
+            );
+
+            const fetchedTasks = [...categorySet]
+              .map((category) => {
+                const task1d = dbTasks
+                  .filter(
+                    (dbTask) =>
+                      dbTask.category === category && dbTask.disabled === false
+                  )
+                  .map((elem) => {
+                    return { ...elem };
+                  });
+                var tasks2d = [];
+                while (task1d.length) tasks2d.push(task1d.splice(0, 2));
+                return { category: category, tasks: tasks2d };
+              })
+              .filter((elem) => elem.tasks.length > 0);
+            setTasks(fetchedTasks);
+          },
+          (err) => {
+            console.log(`Encountered error: ${err}`);
+          }
+        );
+      }
+    };
+    fetchData();
+    return () => {
+      isCancelled = true;
+    };
   }, []);
-
-  const setAllTasks = async () => {
-    const userRef = dbh.collection("Users").doc(`${uid}`);
-    const user = await userRef.get();
-    const taskIds = user.data().tasks;
-    const dbTasks = await Promise.all(
-      taskIds.map(async (dbTaskId) => {
-        const taskRef = dbh.collection("Tasks").doc(`${dbTaskId}`);
-        const dbTask = await taskRef.get();
-        return { ...dbTask.data() };
-      })
-    );
-
-    const categorySet = new Set(dbTasks.map((currTask) => currTask.category));
-
-    const fetchedTasks = [...categorySet]
-      .map((category) => {
-        const task1d = dbTasks
-          .filter(
-            (dbTask) =>
-              dbTask.category === category && dbTask.disabled === false
-          )
-          .map((elem) => {
-            return { ...elem };
-          });
-        var tasks2d = [];
-        while (task1d.length) tasks2d.push(task1d.splice(0, 2));
-        return { category: category, tasks: tasks2d };
-      })
-      .filter((elem) => elem.tasks.length > 0);
-    setTasks(fetchedTasks);
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -91,15 +106,6 @@ export default function AdminTaskScreen({ navigation }) {
           onPress={() => {
             var newDocRef = dbh.collection("Tasks").doc();
             newDocRef.set({});
-            console.log(newDocRef.id);
-            // dbh
-            //   .collection("Tasks")
-            //   .add({})
-            //   .then((docRef) => {
-            //     console.log("Document written with ID: ", docRef.id);
-            //   });
-
-            // console.log(newDocRef.id);
             navigation.navigate("AdminTaskEdit", {
               id: newDocRef.id,
               instructions: [],
@@ -118,7 +124,7 @@ export default function AdminTaskScreen({ navigation }) {
       <ScrollView style={{ marginBottom: 100, marginTop: -50 }}>
         {tasks.map((elem, i) => {
           return (
-            <View key={"category" + i}>
+            <View key={elem.id} key={"row" + i}>
               <Text style={styles.subtitle}>{elem.category}</Text>
               {elem.tasks.map((taskRow, i) => {
                 return (

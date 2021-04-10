@@ -41,7 +41,7 @@ export default function AdminTaskEditScreen({ navigation, route }) {
   console.log(instructions);
   const [toggleCheckBox, setToggleCheckBox] = useState(true);
   const [selectedTime, setSelectedTime] = useState(
-    route.params.time === "" ? new Date() : new Date(route.params.time * 1000)
+    route.params.time === "" ? new Date() : route.params.time.toDate()
   );
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
   const [image, setImage] = useState(route.params.image);
@@ -127,15 +127,28 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               disabled: false,
               time: time,
               image: url,
+              disabled: false,
+              id: taskId,
             })
-            // .then(() => {
-            //   dbh
-            //     .collection("Users")
-            //     .doc(uid)
-            //     .update({
-            //       // tasks: admin.firestore.FieldValue.arrayUnion(taskId),
-            //     });
-            // })
+            .then(() => {
+              let tasks = [];
+              dbh
+                .collection("Users")
+                .doc(`${uid}`)
+                .get()
+                .then((query) => {
+                  tasks = [...query.data().tasks];
+                  if (!tasks.includes(taskId)) {
+                    tasks.push(taskId);
+                  }
+                  console.log(tasks);
+                })
+                .then(() => {
+                  dbh.collection("Users").doc(`${uid}`).update({
+                    tasks: tasks,
+                  });
+                });
+            })
             .then(() => {
               Toast.show({
                 text: "Saved Successfully!",
@@ -157,15 +170,28 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               disabled: false,
               time: "",
               image: url,
+              disabled: false,
+              id: taskId,
             })
-            // .then(() => {
-            //   dbh
-            //     .collection("Users")
-            //     .doc(uid)
-            //     .update({
-            //       tasks: admin.firestore.FieldValue.arrayUnion(taskId),
-            //     });
-            // })
+            .then(() => {
+              let tasks = [];
+              dbh
+                .collection("Users")
+                .doc(`${uid}`)
+                .get()
+                .then((query) => {
+                  tasks = [...query.data().tasks];
+                  if (!tasks.includes(taskId)) {
+                    tasks.push(taskId);
+                  }
+                  console.log(tasks);
+                })
+                .then(() => {
+                  dbh.collection("Users").doc(`${uid}`).update({
+                    tasks: tasks,
+                  });
+                });
+            })
             .then(() => {
               Toast.show({
                 text: "Saved Successfully!",
