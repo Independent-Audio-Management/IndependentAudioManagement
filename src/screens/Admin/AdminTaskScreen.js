@@ -30,9 +30,10 @@ export default function AdminTaskScreen({ navigation }) {
     let isCancelled = false;
     const fetchData = async () => {
       if (!isCancelled) {
-        const userRef = dbh.collection("Users").doc(`${uid}`);
-        const user = await userRef.get();
+        const userQuery = dbh.collection("Users").doc(`${uid}`);
+        const user = await userQuery.get();
         const taskIds = user.data().tasks;
+        console.log(taskIds);
         const taskQuery = dbh.collection("Tasks").where("id", "in", taskIds);
         taskQuery.onSnapshot(
           (querySnapshot) => {
