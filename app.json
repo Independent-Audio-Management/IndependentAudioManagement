@@ -4,7 +4,7 @@
   "expo": {
     "name": "iAM",
     "slug": "iAM",
-    "version": "1.4.0",
+    "version": "2.0.0",
     "privacy": "unlisted",
     "orientation": "portrait",
     "icon": "./src/assets/images/icon.png",
@@ -24,6 +24,6 @@
     "web": {
       "favicon": "./src/assets/images/icon.png"
     },
-    "description": ""
+    "description": "Admin mode fully implemented"
   }
 }

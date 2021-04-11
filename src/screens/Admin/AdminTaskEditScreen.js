@@ -127,7 +127,7 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               image: url,
               disabled: false,
               id: taskId,
-              instructions: [],
+              instructions: instructions,
             })
             .then(() => {
               let tasks = [];
@@ -171,7 +171,7 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               image: url,
               disabled: false,
               id: taskId,
-              instructions: [],
+              instructions: instructions,
             })
             .then(() => {
               let tasks = [];
@@ -418,7 +418,7 @@ export default function AdminTaskEditScreen({ navigation, route }) {
                 navigation.navigate("AdminInstructionOrder", {
                   taskId: taskId,
                   taskname: taskName,
-                  instructions: route.params.instructions,
+                  instructions: instructions,
                 });
               } else {
                 Toast.show({

@@ -6,7 +6,8 @@
     "web": "expo start --web",
     "prod": "expo start --no-dev --minify",
     "start": "expo start",
-    "test": "jest"
+    "test": "jest",
+    "build": "expo build:ios"
   },
   "dependencies": {
     "@freakycoder/react-native-helpers": "^1.0.1",
