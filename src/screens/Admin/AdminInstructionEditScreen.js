@@ -48,7 +48,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
   const [image, setImage] = useState(route.params.image);
   const [recording, setRecording] = useState(route.params.audio);
   const [sound, setSound] = useState();
-  const [recordingURI, setRecordingURI] = useState(null);
+  const [recordingURI, setRecordingURI] = useState(route.params.audio);
   const [savingState, setSavingState] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
 
@@ -329,7 +329,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
           )}
           <TouchableOpacity
             style={styles.playpause}
-            disabled={recording}
+            disabled={isRecording}
             onPress={playSound}
           >
             <Image
