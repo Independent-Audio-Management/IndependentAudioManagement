@@ -165,6 +165,7 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
                             image: step.image,
                             audio: step.audio,
                             duration: step.duration,
+                            stepId: step.id,
                             taskId: taskId,
                           });
                         }
