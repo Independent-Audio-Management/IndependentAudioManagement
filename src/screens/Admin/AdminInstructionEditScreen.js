@@ -173,7 +173,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
       var instruction = {
         text: instructionName,
         id: stepId,
-        duration: duration,
+        duration: parseInt(duration),
       };
 
       uploadImage(imageURI).then((url) => {
