@@ -40,13 +40,17 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
   //   Math.max(...steps.map((stepObj) => stepObj.step), 0) + 1
   // );
   const [step, setStep] = useState(1);
-  const [stepId, setStepId] = useState(uuid.v4());
+  const [stepId, setStepId] = useState(
+    !route.params.stepId ? uuid.v4() : route.params.stepId
+  );
+  console.log(stepId);
   const [duration, setDuration] = useState(route.params.duration);
   const [image, setImage] = useState(route.params.image);
   const [recording, setRecording] = useState(route.params.audio);
   const [sound, setSound] = useState();
   const [recordingURI, setRecordingURI] = useState(null);
   const [savingState, setSavingState] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -82,6 +86,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
       );
       await recording.startAsync();
       setRecording(recording);
+      setIsRecording(true);
       console.log("Recording started");
     } catch (err) {
       console.error("Failed to start recording", err);
@@ -91,6 +96,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
   async function stopRecording() {
     console.log("Stopping recording..");
     setRecording(undefined);
+    setIsRecording(false);
     await recording.stopAndUnloadAsync();
     const uri = recording.getURI();
     setRecordingURI(uri);
@@ -166,7 +172,6 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
       setSavingState(true);
       var instruction = {
         text: instructionName,
-        step: step,
         id: stepId,
         duration: duration,
       };
@@ -305,7 +310,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
           <NativeButton title="Play Sound" onPress={playSound} />
         </View> */}
         <View style={styles.controls}>
-          {recording ? (
+          {isRecording ? (
             <TouchableOpacity style={styles.playpause} onPress={stopRecording}>
               <Image
                 source={require("../../assets/icons/record_stop.png")}
