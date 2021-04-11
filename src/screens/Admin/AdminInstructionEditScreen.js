@@ -211,7 +211,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
               Toast.show({
                 text: "Saved Successfully!",
                 // buttonText: "Okay",
-                type: "warning",
+                type: "success",
                 duration: 4000,
               });
               console.log("Instruction successfully added/updated!");

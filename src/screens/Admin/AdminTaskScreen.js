@@ -23,21 +23,22 @@ export default function AdminTaskScreen({ navigation }) {
   const [uid] = useState(user.uid);
   const [tasks, setTasks] = useState([]);
   const [taskIds, setTaskIds] = useState([]);
-  // const [trigger, setTrigger] = useState(0)
   const [loaded] = useFonts({
     Rubik: require("../../assets/fonts/Rubik-Regular.ttf"),
   });
 
   useEffect(() => {
     let isCancelled = false;
-    dbh
-      .collection("Users")
-      .doc(`${uid}`)
-      .onSnapshot((doc) => {
-        const taskIdsNew = [...doc.data().tasks];
-        console.log(taskIdsNew);
-        setTaskIds(taskIdsNew);
-      });
+    if (!isCancelled) {
+      dbh
+        .collection("Users")
+        .doc(`${uid}`)
+        .onSnapshot((doc) => {
+          const taskIdsNew = [...doc.data().tasks];
+          console.log(taskIdsNew);
+          setTaskIds(taskIdsNew);
+        });
+    }
     return () => {
       isCancelled = true;
     };
