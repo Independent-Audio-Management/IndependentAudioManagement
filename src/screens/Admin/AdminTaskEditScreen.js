@@ -37,8 +37,6 @@ export default function AdminTaskEditScreen({ navigation, route }) {
   const [taskName, setTaskName] = useState(route.params.taskname);
   const [category, setCategory] = useState(route.params.category);
   const [instructions, setInstructions] = useState(route.params.instructions);
-  console.log(typeof instructions[0]);
-  console.log(instructions);
   const [toggleCheckBox, setToggleCheckBox] = useState(true);
   const [selectedTime, setSelectedTime] = useState(
     route.params.time === "" ? new Date() : route.params.time.toDate()
@@ -129,6 +127,7 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               image: url,
               disabled: false,
               id: taskId,
+              instructions: [],
             })
             .then(() => {
               let tasks = [];
@@ -172,6 +171,7 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               image: url,
               disabled: false,
               id: taskId,
+              instructions: [],
             })
             .then(() => {
               let tasks = [];
