@@ -22,9 +22,9 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
-import { storage, dbh } from "../../utils/firebase";
+import { storage, dbh, db } from "../../utils/firebase";
 import { AuthUserContext } from "../../navigations/AuthUserProvider";
-// import * as admin from "firebase-admin";
+import uuid from "uuid";
 
 export default function AdminTaskEditScreen({ navigation, route }) {
   const { user } = useContext(AuthUserContext);
@@ -133,7 +133,7 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               let tasks = [];
               dbh
                 .collection("Users")
-                .doc(`${uid}`)
+                .doc(uid)
                 .get()
                 .then((query) => {
                   tasks = [...query.data().tasks];
@@ -177,7 +177,7 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               let tasks = [];
               dbh
                 .collection("Users")
-                .doc(`${uid}`)
+                .doc(uid)
                 .get()
                 .then((query) => {
                   tasks = [...query.data().tasks];
@@ -229,21 +229,45 @@ export default function AdminTaskEditScreen({ navigation, route }) {
             listResults.items.map((item) => {
               return item.delete();
             })
-          ).then(() => {
-            dbh
-              .collection("Tasks")
-              .doc(taskId)
-              .delete()
-              .then(() => {
-                Toast.show({
-                  text: "Task deleted successfully!",
-                  type: "warning",
-                  duration: 3000,
+          )
+            .then(() => {
+              console.log("deleting ", taskId);
+              dbh.collection("Tasks").doc(taskId).delete();
+            })
+            .then(() => {
+              console.log("deleting from user side");
+              let tasks = [];
+              dbh
+                .collection("Users")
+                .doc(uid)
+                .get()
+                .then((query) => {
+                  console.log("hello");
+                  tasks = [...query.data().tasks];
+                  console.log("deleting...", taskId);
+                  console.log(tasks);
+                  const index = tasks.indexOf(taskId);
+                  console.log("index", index);
+                  if (index > -1) {
+                    tasks.splice(index, 1);
+                  }
+                  console.log("new tasks", tasks);
+                })
+                .then(() => {
+                  dbh.collection("Users").doc(uid).update({
+                    tasks: tasks,
+                  });
                 });
-                console.log("Task deleted successfully!");
-                navigation.navigate("AdminTask");
+            })
+            .then(() => {
+              Toast.show({
+                text: "Task deleted successfully!",
+                type: "warning",
+                duration: 3000,
               });
-          });
+              console.log("Task deleted successfully!");
+              navigation.navigate("AdminTask");
+            });
         });
       });
     });
@@ -278,9 +302,13 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               marginTop: 60,
               backgroundColor: "#2A9D8F",
             }}
-            onPress={() =>
-              addTask(taskName, category, toggleCheckBox, selectedTime, image)
-            }
+            onPress={addTask(
+              taskName,
+              category,
+              toggleCheckBox,
+              selectedTime,
+              image
+            )}
           >
             <Icon name="save" />
             <Text>Save</Text>

@@ -4,7 +4,7 @@
   "expo": {
     "name": "iAM",
     "slug": "iAM",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "privacy": "unlisted",
     "orientation": "portrait",
     "icon": "./src/assets/images/icon.png",
@@ -16,10 +16,7 @@
       "bundleIdentifier": "com.macactivelives.iam"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./src/assets/images/icon.png",
-        "backgroundColor": "#FFF"
-      }
+      "package": "com.macactivelives.iam"
     },
     "web": {
       "favicon": "./src/assets/images/icon.png"

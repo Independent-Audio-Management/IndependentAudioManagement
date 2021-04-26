@@ -117,11 +117,13 @@ export default function AdminSignUpScreen({ navigation }) {
                           values.email,
                           values.password
                         ).then((userCredential) => {
+                          censoredValues = { ...values };
+                          delete censoredValues.password;
                           dbh
                             .collection("Users")
                             .doc(userCredential.user.uid)
                             .set({
-                              ...values,
+                              ...censoredValues,
                               pin: pinArray,
                               tasks: [
                                 "22df0ac9-6cc6-4e4d-84e1-7adc99af384f",
