@@ -42,6 +42,23 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
   );
 
   const [taskId, setTaskId] = useState(route.params.taskId);
+
+  useEffect(() => {
+    let isCancelled = false;
+    if (!isCancelled) {
+      dbh
+        .collection("Tasks")
+        .doc(`${taskId}`)
+        .onSnapshot((doc) => {
+          const newInstructions = [...doc.data().instructions];
+          setInstructions(newInstructions);
+        });
+    }
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
   const moveItem = (from, to) => {
     const instructionsCopy = [...instructions];
     // remove `from` item and store it
@@ -165,6 +182,8 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
                             image: step.image,
                             audio: step.audio,
                             duration: step.duration,
+                            stepId: step.id,
+                            taskId: taskId,
                           });
                         }
                       }}
@@ -235,6 +254,7 @@ export default function AdminInstructionOrderScreen({ navigation, route }) {
                 image: null,
                 audio: null,
                 duration: "",
+                taskId: taskId,
               });
             }}
           >

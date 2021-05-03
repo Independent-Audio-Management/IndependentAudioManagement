@@ -40,13 +40,17 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
   //   Math.max(...steps.map((stepObj) => stepObj.step), 0) + 1
   // );
   const [step, setStep] = useState(1);
-  const [stepId, setStepId] = useState(uuid.v4());
+  const [stepId, setStepId] = useState(
+    !route.params.stepId ? uuid.v4() : route.params.stepId
+  );
+  console.log(stepId);
   const [duration, setDuration] = useState(route.params.duration);
   const [image, setImage] = useState(route.params.image);
   const [recording, setRecording] = useState(route.params.audio);
   const [sound, setSound] = useState();
-  const [recordingURI, setRecordingURI] = useState(null);
+  const [recordingURI, setRecordingURI] = useState(route.params.audio);
   const [savingState, setSavingState] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -77,11 +81,31 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
       });
       console.log("Starting recording..");
       const recording = new Audio.Recording();
-      await recording.prepareToRecordAsync(
-        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-      );
+      await recording.prepareToRecordAsync({
+        isMeteringEnabled: true,
+        android: {
+          extension: ".m4a",
+          outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_MPEG_4,
+          audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AAC,
+          sampleRate: 44100,
+          numberOfChannels: 2,
+          bitRate: 128000,
+        },
+        ios: {
+          extension: ".m4a",
+          outputFormat: Audio.RECORDING_OPTION_IOS_OUTPUT_FORMAT_MPEG4AAC,
+          audioQuality: Audio.RECORDING_OPTION_IOS_AUDIO_QUALITY_MIN,
+          sampleRate: 44100,
+          numberOfChannels: 2,
+          bitRate: 128000,
+          linearPCMBitDepth: 16,
+          linearPCMIsBigEndian: false,
+          linearPCMIsFloat: false,
+        },
+      });
       await recording.startAsync();
       setRecording(recording);
+      setIsRecording(true);
       console.log("Recording started");
     } catch (err) {
       console.error("Failed to start recording", err);
@@ -91,6 +115,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
   async function stopRecording() {
     console.log("Stopping recording..");
     setRecording(undefined);
+    setIsRecording(false);
     await recording.stopAndUnloadAsync();
     const uri = recording.getURI();
     setRecordingURI(uri);
@@ -166,9 +191,8 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
       setSavingState(true);
       var instruction = {
         text: instructionName,
-        step: step,
         id: stepId,
-        duration: duration,
+        duration: parseInt(duration),
       };
 
       uploadImage(imageURI).then((url) => {
@@ -206,7 +230,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
               Toast.show({
                 text: "Saved Successfully!",
                 // buttonText: "Okay",
-                type: "warning",
+                type: "success",
                 duration: 4000,
               });
               console.log("Instruction successfully added/updated!");
@@ -305,7 +329,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
           <NativeButton title="Play Sound" onPress={playSound} />
         </View> */}
         <View style={styles.controls}>
-          {recording ? (
+          {isRecording ? (
             <TouchableOpacity style={styles.playpause} onPress={stopRecording}>
               <Image
                 source={require("../../assets/icons/record_stop.png")}
@@ -324,7 +348,7 @@ export default function AdminInstructionEditScreen({ navigation, route }) {
           )}
           <TouchableOpacity
             style={styles.playpause}
-            disabled={recording}
+            disabled={isRecording}
             onPress={playSound}
           >
             <Image

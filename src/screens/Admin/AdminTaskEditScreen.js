@@ -22,9 +22,9 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
-import { storage, dbh } from "../../utils/firebase";
+import { storage, dbh, db } from "../../utils/firebase";
 import { AuthUserContext } from "../../navigations/AuthUserProvider";
-// import * as admin from "firebase-admin";
+import uuid from "uuid";
 
 export default function AdminTaskEditScreen({ navigation, route }) {
   const { user } = useContext(AuthUserContext);
@@ -37,8 +37,6 @@ export default function AdminTaskEditScreen({ navigation, route }) {
   const [taskName, setTaskName] = useState(route.params.taskname);
   const [category, setCategory] = useState(route.params.category);
   const [instructions, setInstructions] = useState(route.params.instructions);
-  console.log(typeof instructions[0]);
-  console.log(instructions);
   const [toggleCheckBox, setToggleCheckBox] = useState(true);
   const [selectedTime, setSelectedTime] = useState(
     route.params.time === "" ? new Date() : route.params.time.toDate()
@@ -127,15 +125,29 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               disabled: false,
               time: time,
               image: url,
+              disabled: false,
+              id: taskId,
+              instructions: instructions,
             })
-            // .then(() => {
-            //   dbh
-            //     .collection("Users")
-            //     .doc(uid)
-            //     .update({
-            //       // tasks: admin.firestore.FieldValue.arrayUnion(taskId),
-            //     });
-            // })
+            .then(() => {
+              let tasks = [];
+              dbh
+                .collection("Users")
+                .doc(uid)
+                .get()
+                .then((query) => {
+                  tasks = [...query.data().tasks];
+                  if (!tasks.includes(taskId)) {
+                    tasks.push(taskId);
+                  }
+                  console.log(tasks);
+                })
+                .then(() => {
+                  dbh.collection("Users").doc(`${uid}`).update({
+                    tasks: tasks,
+                  });
+                });
+            })
             .then(() => {
               Toast.show({
                 text: "Saved Successfully!",
@@ -157,15 +169,29 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               disabled: false,
               time: "",
               image: url,
+              disabled: false,
+              id: taskId,
+              instructions: instructions,
             })
-            // .then(() => {
-            //   dbh
-            //     .collection("Users")
-            //     .doc(uid)
-            //     .update({
-            //       tasks: admin.firestore.FieldValue.arrayUnion(taskId),
-            //     });
-            // })
+            .then(() => {
+              let tasks = [];
+              dbh
+                .collection("Users")
+                .doc(uid)
+                .get()
+                .then((query) => {
+                  tasks = [...query.data().tasks];
+                  if (!tasks.includes(taskId)) {
+                    tasks.push(taskId);
+                  }
+                  console.log(tasks);
+                })
+                .then(() => {
+                  dbh.collection("Users").doc(`${uid}`).update({
+                    tasks: tasks,
+                  });
+                });
+            })
             .then(() => {
               Toast.show({
                 text: "Saved Successfully!",
@@ -203,21 +229,45 @@ export default function AdminTaskEditScreen({ navigation, route }) {
             listResults.items.map((item) => {
               return item.delete();
             })
-          ).then(() => {
-            dbh
-              .collection("Tasks")
-              .doc(taskId)
-              .delete()
-              .then(() => {
-                Toast.show({
-                  text: "Task deleted successfully!",
-                  type: "warning",
-                  duration: 3000,
+          )
+            .then(() => {
+              console.log("deleting ", taskId);
+              dbh.collection("Tasks").doc(taskId).delete();
+            })
+            .then(() => {
+              console.log("deleting from user side");
+              let tasks = [];
+              dbh
+                .collection("Users")
+                .doc(uid)
+                .get()
+                .then((query) => {
+                  console.log("hello");
+                  tasks = [...query.data().tasks];
+                  console.log("deleting...", taskId);
+                  console.log(tasks);
+                  const index = tasks.indexOf(taskId);
+                  console.log("index", index);
+                  if (index > -1) {
+                    tasks.splice(index, 1);
+                  }
+                  console.log("new tasks", tasks);
+                })
+                .then(() => {
+                  dbh.collection("Users").doc(uid).update({
+                    tasks: tasks,
+                  });
                 });
-                console.log("Task deleted successfully!");
-                navigation.navigate("AdminTask");
+            })
+            .then(() => {
+              Toast.show({
+                text: "Task deleted successfully!",
+                type: "warning",
+                duration: 3000,
               });
-          });
+              console.log("Task deleted successfully!");
+              navigation.navigate("AdminTask");
+            });
         });
       });
     });
@@ -252,9 +302,13 @@ export default function AdminTaskEditScreen({ navigation, route }) {
               marginTop: 60,
               backgroundColor: "#2A9D8F",
             }}
-            onPress={() =>
-              addTask(taskName, category, toggleCheckBox, selectedTime, image)
-            }
+            onPress={addTask(
+              taskName,
+              category,
+              toggleCheckBox,
+              selectedTime,
+              image
+            )}
           >
             <Icon name="save" />
             <Text>Save</Text>
@@ -382,13 +436,27 @@ export default function AdminTaskEditScreen({ navigation, route }) {
             <Icon style={styles.footerTabIcon} name="undo" />
           </Button>
           <Button
-            onPress={() =>
-              navigation.navigate("AdminInstructionOrder", {
-                taskname: taskName,
-                instructions: route.params.instructions,
-                taskId: taskId,
-              })
-            }
+            onPress={() => {
+              if (
+                taskName !== "" &&
+                category !== "" &&
+                image !== null &&
+                savedState
+              ) {
+                navigation.navigate("AdminInstructionOrder", {
+                  taskId: taskId,
+                  taskname: taskName,
+                  instructions: instructions,
+                });
+              } else {
+                Toast.show({
+                  text: "Please add task details and save",
+                  // buttonText: "Okay",
+                  type: "danger",
+                  duration: 3000,
+                });
+              }
+            }}
           >
             <Icon style={styles.footerTabIcon} name="list" />
           </Button>

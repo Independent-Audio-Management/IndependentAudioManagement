@@ -22,61 +22,79 @@ export default function AdminTaskScreen({ navigation }) {
   const { user } = useContext(AuthUserContext);
   const [uid] = useState(user.uid);
   const [tasks, setTasks] = useState([]);
+  const [taskIds, setTaskIds] = useState([]);
   const [loaded] = useFonts({
     Rubik: require("../../assets/fonts/Rubik-Regular.ttf"),
   });
 
   useEffect(() => {
     let isCancelled = false;
-    const fetchData = async () => {
-      if (!isCancelled) {
-        const userRef = dbh.collection("Users").doc(`${uid}`);
-        const user = await userRef.get();
-        const taskIds = user.data().tasks;
-        const taskQuery = dbh.collection("Tasks").where("id", "in", taskIds);
-        // const dbTasks = [];
-        taskQuery.onSnapshot(
-          (querySnapshot) => {
-            console.log(
-              `Received query snapshot of size ${querySnapshot.size}`
-            );
-            // querySnapshot.forEach((doc) => dbTasks.push({ ...doc.data() }));
-            const dbTasks = querySnapshot.docs.map((doc) => {
-              return { ...doc.data() };
-            });
-            console.log(dbTasks.length);
-            const categorySet = new Set(
-              dbTasks.map((currTask) => currTask.category)
-            );
-
-            const fetchedTasks = [...categorySet]
-              .map((category) => {
-                const task1d = dbTasks
-                  .filter(
-                    (dbTask) =>
-                      dbTask.category === category && dbTask.disabled === false
-                  )
-                  .map((elem) => {
-                    return { ...elem };
-                  });
-                var tasks2d = [];
-                while (task1d.length) tasks2d.push(task1d.splice(0, 2));
-                return { category: category, tasks: tasks2d };
-              })
-              .filter((elem) => elem.tasks.length > 0);
-            setTasks(fetchedTasks);
-          },
-          (err) => {
-            console.log(`Encountered error: ${err}`);
-          }
-        );
-      }
-    };
-    fetchData();
+    if (!isCancelled) {
+      dbh
+        .collection("Users")
+        .doc(`${uid}`)
+        .onSnapshot((doc) => {
+          const taskIdsNew = [...doc.data().tasks];
+          console.log(taskIdsNew);
+          setTaskIds(taskIdsNew);
+        });
+    }
     return () => {
       isCancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    let isCancelled = false;
+    fetchData(isCancelled);
+    return () => {
+      isCancelled = true;
+    };
+  }, [taskIds]);
+
+  const fetchData = async (isCancelled) => {
+    if (!isCancelled) {
+      console.log(taskIds);
+      const taskQuery = dbh.collection("Tasks");
+      // .where("id", "in", taskIds.slice(0, 10));
+      taskQuery.onSnapshot(
+        (querySnapshot) => {
+          console.log(`Received query snapshot of size ${querySnapshot.size}`);
+          const dbTasks = querySnapshot.docs
+            .map((doc) => {
+              if (taskIds.includes(doc.data().id)) {
+                return { ...doc.data() };
+              }
+            })
+            .filter((taskElem) => !!taskElem);
+
+          const categorySet = new Set(
+            dbTasks.map((currTask) => currTask.category)
+          );
+
+          const fetchedTasks = [...categorySet]
+            .map((category) => {
+              const task1d = dbTasks
+                .filter(
+                  (dbTask) =>
+                    dbTask.category === category && dbTask.disabled === false
+                )
+                .map((elem) => {
+                  return { ...elem };
+                });
+              var tasks2d = [];
+              while (task1d.length) tasks2d.push(task1d.splice(0, 2));
+              return { category: category, tasks: tasks2d };
+            })
+            .filter((elem) => elem.tasks.length > 0);
+          setTasks(fetchedTasks);
+        },
+        (err) => {
+          console.log(`Encountered error: ${err}`);
+        }
+      );
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
